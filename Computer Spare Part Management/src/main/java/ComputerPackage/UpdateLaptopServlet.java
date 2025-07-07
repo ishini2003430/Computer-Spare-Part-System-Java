@@ -1,0 +1,62 @@
+package ComputerPackage;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/UpdateLaptopServlet")
+public class UpdateLaptopServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+
+        int id = Integer.parseInt(request.getParameter("id"));
+        String brand = request.getParameter("brand");
+        String model = request.getParameter("model");
+        String cpu = request.getParameter("cpu");
+        String gpu = request.getParameter("gpu");
+        String ram = request.getParameter("ram");
+        String storage = request.getParameter("storage");
+        String display = request.getParameter("display");
+        String item_code = request.getParameter("item_code");
+        String image_url = request.getParameter("image_url");
+        String stock_status = request.getParameter("stock_status");
+        double price = Double.parseDouble(request.getParameter("price"));
+        double cash_price = Double.parseDouble(request.getParameter("cash_price"));
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+            String sql = "UPDATE laptops SET brand=?, model=?, cpu=?, gpu=?, ram=?, storage=?, display=?, item_code=?, price=?, cash_price=?, image_url=?, stock_status=? WHERE id=?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, brand);
+            ps.setString(2, model);
+            ps.setString(3, cpu);
+            ps.setString(4, gpu);
+            ps.setString(5, ram);
+            ps.setString(6, storage);
+            ps.setString(7, display);
+            ps.setString(8, item_code);
+            ps.setDouble(9, price);
+            ps.setDouble(10, cash_price);
+            ps.setString(11, image_url);
+            ps.setString(12, stock_status);
+            ps.setInt(13, id);
+            ps.executeUpdate();
+
+            conn.close();
+            response.sendRedirect("ViewLaptop.jsp");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().println("Update error: " + e.getMessage());
+        }
+    }
+}

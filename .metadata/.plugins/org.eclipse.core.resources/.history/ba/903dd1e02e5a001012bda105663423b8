@@ -1,0 +1,118 @@
+<%@ page import="java.sql.*, java.util.*, ComputerPackage.CartItem" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Printers - TechParts</title>
+    <style>
+        /* (CSS styles from your provided code are kept the same) */
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: red;
+            color: white;
+            font-size: 10px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<div class="header">
+    <div class="logo">
+        <img src="images/logo.png" alt="logo" width="40" height="40" />
+        <h2>TechParts</h2>
+    </div>
+    <div class="nav-links">
+        <a href="Home.jsp">Home</a>
+        <a href="AboutUs.jsp">About Us</a>
+        <div class="dropdown">
+            <span class="dropbtn">All Products</span>
+            <div class="dropdown-content">
+                <a href="Laptops.jsp">Laptops</a>
+                <a href="LaptopAccessories.jsp">Laptop Accessories</a>
+                <a href="computerAccessories.jsp">Desktop & Accessories</a>
+                <a href="cctvcamera.jsp">CCTV Camera & Accessories</a>
+                <a href="printers.jsp" class="active-link">Printers</a>
+            </div>
+        </div>
+        <a href="Services.jsp">Services</a>
+        <a href="Paymentmethod.jsp">Payment Methods</a>
+        <a href="Contactus.jsp">Contact Us</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="ViewCart.jsp" class="cart" style="text-decoration: none; color: inherit;">
+            🛒
+            <% 
+                List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+                int count = 0;
+                if (cart != null) {
+                    for (CartItem item : cart) {
+                        count += item.getQuantity();
+                    }
+                }
+            %>
+            <span class="cart-count"><%= count %></span>
+        </a>
+        <div class="login-btn">
+            <a href="Login.jsp">Login</a>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <h2>All Printers</h2>
+    <div class="grid">
+        <%
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM printers");
+
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    String name = rs.getString("model_name");
+                    double price = rs.getDouble("price");
+                    String image = rs.getString("image_url");
+        %>
+        <div class="card">
+            <img src="<%= image %>" alt="Printer Image" />
+            <h3><%= name %></h3>
+            <p><strong>Brand:</strong> <%= rs.getString("brand") %></p>
+            <p><strong>Item Code:</strong> <%= rs.getString("item_code") %></p>
+            <p><strong>Type:</strong> <%= rs.getString("type") %></p>
+            <p class="price">Rs. <%= String.format("%.2f", price) %></p>
+            <p class="cash-price">Cash: Rs. <%= String.format("%.2f", rs.getDouble("cash_price")) %></p>
+            <p><strong>Status:</strong> <%= rs.getString("status") %></p>
+            <div class="buttons">
+                <form action="AddToCartServlet" method="post" style="margin:0;">
+                    <input type="hidden" name="id" value="<%= id %>" />
+                    <input type="hidden" name="name" value="<%= name %>" />
+                    <input type="hidden" name="price" value="<%= price %>" />
+                    <input type="hidden" name="quantity" value="1" />
+                    <button type="submit" class="add-cart">Add to Cart</button>
+                </form>
+                <a href="ViewPrintersDetails.jsp?id=<%= id %>" class="view-more" style="text-decoration:none; padding: 8px 12px; border-radius: 6px;">View More</a>
+                <button class="buy-now">Buy Now</button>
+            </div>
+        </div>
+        <% 
+                }
+                conn.close();
+            } catch (Exception e) {
+                out.print("<p style='color:red; text-align:center;'>Error: " + e.getMessage() + "</p>");
+            }
+        %>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+<%@ page import="java.sql.*" %>
+<%
+    String orderIdStr = request.getParameter("orderId");
+    if (orderIdStr == null) {
+        out.println("<p style='color:red;'>Order ID is missing.</p>");
+        return;
+    }
+    int orderId = Integer.parseInt(orderIdStr);
+
+    Connection conn = null;
+    PreparedStatement psOrder = null;
+    PreparedStatement psItems = null;
+    ResultSet rsOrder = null;
+    ResultSet rsItems = null;
+
+    String customerName = "";
+    String customerEmail = "";
+    String customerPhone = "";
+    String customerAddress = "";
+    double totalAmount = 0;
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Details - Order #<%= orderId %></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            padding: 30px;
+        }
+        .details-container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .info p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #2563eb;
+            color: white;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 16px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="details-container">
+<%
+    try {
+        Class.forName("com.mysql.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+        // Fetch order info
+        psOrder = conn.prepareStatement("SELECT * FROM orders WHERE id = ?");
+        psOrder.setInt(1, orderId);
+        rsOrder = psOrder.executeQuery();
+
+        if (rsOrder.next()) {
+            customerName = rsOrder.getString("name");
+            customerEmail = rsOrder.getString("email");
+            customerPhone = rsOrder.getString("phone");
+            customerAddress = rsOrder.getString("address");
+            totalAmount = rsOrder.getDouble("total_amount");
+%>
+    <h2>Order #<%= orderId %> Details</h2>
+    <div class="info">
+        <p><strong>Customer Name:</strong> <%= customerName %></p>
+        <p><strong>Email:</strong> <%= customerEmail %></p>
+        <p><strong>Phone:</strong> <%= customerPhone %></p>
+        <p><strong>Address:</strong> <%= customerAddress %></p>
+        <p><strong>Total Amount:</strong> Rs. <%= totalAmount %></p>
+    </div>
+
+    <h3>Ordered Items</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Price (Rs.)</th>
+                <th>Quantity</th>
+                <th>Total Price (Rs.)</th>
+            </tr>
+        </thead>
+        <tbody>
+<%
+            // Fetch order items
+            psItems = conn.prepareStatement("SELECT * FROM order_items WHERE order_id = ?");
+            psItems.setInt(1, orderId);
+            rsItems = psItems.executeQuery();
+
+            while (rsItems.next()) {
+%>
+            <tr>
+                <td><%= rsItems.getInt("product_id") %></td>
+                <td><%= rsItems.getString("product_name") %></td>
+                <td><%= rsItems.getDouble("price") %></td>
+                <td><%= rsItems.getInt("quantity") %></td>
+                <td><%= rsItems.getDouble("price") * rsItems.getInt("quantity") %></td>
+            </tr>
+<%
+            }
+        } else {
+            out.println("<p style='color:red;'>Order not found.</p>");
+        }
+    } catch (Exception e) {
+        out.println("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+    } finally {
+        if (rsOrder != null) rsOrder.close();
+        if (rsItems != null) rsItems.close();
+        if (psOrder != null) psOrder.close();
+        if (psItems != null) psItems.close();
+        if (conn != null) conn.close();
+    }
+%>
+        </tbody>
+    </table>
+    <a href="OrdersList.jsp" class="back-link">Back to Orders List</a>
+</div>
+</body>
+</html>

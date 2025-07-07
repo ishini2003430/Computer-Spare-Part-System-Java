@@ -1,0 +1,51 @@
+package ComputerPackage; // your package name
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+@WebServlet("/UpdateCartServlet")
+public class UpdateCartServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Get product id and new quantity from form
+        String idStr = request.getParameter("id");
+        String quantityStr = request.getParameter("quantity");
+
+        if (idStr == null || quantityStr == null) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+
+        int id = Integer.parseInt(idStr);
+        int quantity = Integer.parseInt(quantityStr);
+
+        if (quantity < 1) quantity = 1; // enforce minimum quantity = 1
+
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+
+        List<HashMap<String, Object>> cart = (List<HashMap<String, Object>>) session.getAttribute("cart");
+        if (cart != null) {
+            for (HashMap<String, Object> item : cart) {
+                int itemId = Integer.parseInt(item.get("id").toString());
+                if (itemId == id) {
+                    // Update quantity
+                    item.put("quantity", quantity);
+                    break;
+                }
+            }
+            session.setAttribute("cart", cart);
+        }
+
+        // Redirect back to cart page
+        response.sendRedirect("ViewCart.jsp");
+    }
+}

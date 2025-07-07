@@ -1,0 +1,182 @@
+<%@ page import="java.sql.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Supplier Details - TechParts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .sidebar {
+            width: 220px;
+            height:700px;
+            background-color: #111827;
+            color: white;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .sidebar h2 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: bold;
+        }
+        .nav-link {
+            color: #d1d5db;
+            padding: 10px 15px;
+            display: block;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: #1e40af;
+            color: white;
+        }
+        .logout-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #ef4444;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+        }
+        .main {
+            flex: 1;
+            padding: 2rem;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .add-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            float: right;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            clear: both;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #111827;
+             color: white;
+        }
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .edit-btn {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <div>
+        <h2>TechParts</h2>
+        <a href="ManagerDashboard.jsp" class="nav-link">Dashboard</a>
+        <a href="Categories.jsp" class="nav-link">Categories</a>
+        <a href="SupplierDetails.jsp" class="nav-link active">Suppliers</a>
+        <a href="ViewOrderDetails.jsp" class="nav-link">Orders</a>
+        <a href="SalesDetails.jsp" class="nav-link">Sales</a>
+        <a href="Reports.jsp" class="nav-link">Reports</a>
+        <a href="Setting.jsp" class="nav-link">Settings</a>
+    </div>
+    <a href="Login.jsp" class="logout-btn">Logout</a>
+</div>
+<div class="main">
+    <h1>Supplier Details</h1>
+    
+    <!-- Add Supplier Button -->
+    <a href="AddSupplier.jsp" class="add-button">+ Add Supplier</a>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Company</th>
+            <th>Address</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+            Connection conn = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+                ps = conn.prepareStatement("SELECT * FROM suppliers");
+                rs = ps.executeQuery();
+                while (rs.next()) {
+        %>
+        <tr>
+            <td><%= rs.getInt("id") %></td>
+            <td><%= rs.getString("name") %></td>
+            <td><%= rs.getString("email") %></td>
+            <td><%= rs.getString("phone") %></td>
+            <td><%= rs.getString("company") %></td>
+            <td><%= rs.getString("address") %></td>
+            <td>
+                <a href="EditSupplier.jsp?id=<%=rs.getInt("id")%>" class="btn edit-btn">Edit</a>
+                <a href="DeleteSupplierServlet?id=<%=rs.getInt("id")%>" class="btn delete-btn" onclick="return confirm('Are you sure you want to delete this supplier?');">Delete</a>
+            </td>
+        </tr>
+        <%
+                }
+            } catch (Exception e) {
+                out.println("<tr><td colspan='7' style='color:red;'>Error: " + e.getMessage() + "</td></tr>");
+            } finally {
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
+            }
+        %>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

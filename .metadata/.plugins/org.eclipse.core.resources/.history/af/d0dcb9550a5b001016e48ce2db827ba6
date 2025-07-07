@@ -1,0 +1,353 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    // Fetch real data passed from servlet (ensure servlet sets these attributes)
+    Integer totalUsers = (Integer) request.getAttribute("totalUsers");
+    Integer totalOrders = (Integer) request.getAttribute("totalOrders");
+    Double totalRevenue = (Double) request.getAttribute("totalRevenue");
+    Integer totalProducts = (Integer) request.getAttribute("totalProducts");
+
+    // Provide fallback values if null
+    if (totalUsers == null) totalUsers = 0;
+    if (totalOrders == null) totalOrders = 0;
+    if (totalRevenue == null) totalRevenue = 0.0;
+    if (totalProducts == null) totalProducts = 0;
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Manager Dashboard - TechParts</title>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Reset */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f9fafb;
+            color: #374151;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background-color: #111827;
+            color: white;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            letter-spacing: 1.5px;
+        }
+
+        .nav-link {
+            color: #d1d5db;
+            padding: 12px 16px;
+            margin-bottom: 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: #1e40af;
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            padding: 12px 16px;
+            background-color: #ef4444;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            user-select: none;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #b91c1c;
+        }
+
+        /* Main Content */
+        .main {
+            flex-grow: 1;
+            padding: 2.5rem 3rem;
+            overflow-y: auto;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #1f2937;
+            letter-spacing: 1px;
+        }
+
+        /* Cards container */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+            gap: 1rem; /* reduced gap */
+            margin-bottom: 2.5rem;
+        }
+
+        /* Card style */
+        .card {
+            background: #2563eb;
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgb(37 99 235 / 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .card:hover {
+            background-color: #1e40af;
+            box-shadow: 0 12px 20px rgb(30 64 175 / 0.5);
+        }
+
+        .card h3 {
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin: 0 0 0.3rem;
+            letter-spacing: 0.8px;
+        }
+
+        .card p {
+            font-size: 2rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1;
+            letter-spacing: 1.5px;
+        }
+
+        /* Charts container */
+        .charts {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgb(0 0 0 / 0.05);
+            padding: 1.5rem 2rem;
+            flex: 1 1 300px;
+        }
+
+        .chart-card h3 {
+            margin-top: 0;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 720px) {
+            body {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                padding: 1rem;
+                overflow-x: auto;
+            }
+
+            .sidebar h2 {
+                flex: 1 0 auto;
+                margin-bottom: 0;
+            }
+
+            .nav-link {
+                margin: 0 0.7rem 0 0;
+                padding: 8px 12px;
+            }
+
+            .logout-btn {
+                margin: 0 0 0 auto;
+                padding: 8px 12px;
+            }
+
+            .main {
+                padding: 2rem 1.5rem;
+            }
+
+            .charts {
+                flex-direction: column;
+            }
+
+            .chart-card {
+                flex-basis: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>TechParts</h2>
+        <a href="ManagerDashboard.jsp" class="nav-link active">Dashboard</a>
+        <a href="Categories.jsp" class="nav-link">Categories</a>
+        <a href="SupplierDetails.jsp" class="nav-link">Suppliers</a>
+        <a href="ViewOrderDetails.jsp" class="nav-link">Orders</a>
+        <a href="SalesDetails.jsp" class="nav-link">Sales</a>
+         <a href="Reports.jsp" class="nav-link">Reports</a>
+        <a href="Settings.jsp" class="nav-link">Settings</a>
+        <a href="Login.jsp" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="main">
+        <div class="header">Manager Dashboard</div>
+
+        <!-- Info Cards -->
+        <div class="cards">
+            <div class="card">
+                <h3>Total Users</h3>
+                <p><%= totalUsers %></p>
+            </div>
+            <div class="card">
+                <h3>Total Orders</h3>
+                <p><%= totalOrders %></p>
+            </div>
+            <div class="card">
+                <h3>Total Revenue</h3>
+                <p>$<%= String.format("%.2f", totalRevenue) %></p>
+            </div>
+            <div class="card">
+                <h3>Total Products</h3>
+                <p><%= totalProducts %></p>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts">
+            <!-- Sales Over Time Line Chart -->
+            <div class="chart-card">
+                <h3>Sales Over Last 6 Months</h3>
+                <canvas id="salesLineChart" width="100" height="100"></canvas>
+            </div>
+
+            <!-- Product Categories Pie Chart -->
+            <div class="chart-card">
+                <h3>Product Categories</h3>
+                <canvas id="productPieChart" width="300" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sales over last 6 months example data
+        const salesData = {
+            labels: ["Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+            datasets: [{
+                label: "Sales ($)",
+                backgroundColor: "rgba(37, 99, 235, 0.5)",
+                borderColor: "#2563eb",
+                data: [15000, 18000, 14000, 20000, 22000, 25000],
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        };
+
+        const salesConfig = {
+            type: 'line',
+            data: salesData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true },
+                    tooltip: { enabled: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        // Product Categories example data
+        const categoriesData = {
+            labels: ["Laptops", "Accessories", "Desktops", "CCTV", "Printers"],
+            datasets: [{
+                label: "Category Distribution",
+                data: [40, 25, 15, 10, 10],
+                backgroundColor: [
+                    "#2563eb",
+                    "#3b82f6",
+                    "#60a5fa",
+                    "#93c5fd",
+                    "#bfdbfe"
+                ],
+                hoverOffset: 20
+            }]
+        };
+
+        const categoriesConfig = {
+            type: 'pie',
+            data: categoriesData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20, boxWidth: 15 }
+                    },
+                    tooltip: { enabled: true }
+                }
+            }
+        };
+
+        // Render Charts
+        window.onload = function () {
+            const salesCtx = document.getElementById('salesLineChart').getContext('2d');
+            new Chart(salesCtx, salesConfig);
+
+            const productCtx = document.getElementById('productPieChart').getContext('2d');
+            new Chart(productCtx, categoriesConfig);
+        };
+    </script>
+</body>
+</html>

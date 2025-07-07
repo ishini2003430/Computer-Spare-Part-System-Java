@@ -1,0 +1,135 @@
+<%@ page import="java.sql.*, java.util.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Order Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        h2 {
+            margin-top: 40px;
+            color: #333;
+        }
+        table {
+            border-collapse: collapse;
+            width: 90%;
+            margin-bottom: 40px;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #ddd;
+        }
+        .order-block {
+            margin-bottom: 50px;
+            padding: 20px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .order-header {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>All Orders and Their Items</h1>
+
+<%
+    Connection conn = null;
+    PreparedStatement psOrders = null;
+    PreparedStatement psItems = null;
+    ResultSet rsOrders = null;
+    ResultSet rsItems = null;
+
+    try {
+        Class.forName("com.mysql.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+        // Query all orders
+        String sqlOrders = "SELECT * FROM orders ORDER BY id DESC";
+        psOrders = conn.prepareStatement(sqlOrders);
+        rsOrders = psOrders.executeQuery();
+
+        while (rsOrders.next()) {
+            int orderId = rsOrders.getInt("id");
+            String name = rsOrders.getString("name");
+            String email = rsOrders.getString("email");
+            String phone = rsOrders.getString("phone");
+            String address = rsOrders.getString("address");
+            double totalAmount = rsOrders.getDouble("total_amount");
+%>
+    <div class="order-block">
+        <div class="order-header">
+            <h2>Order ID: <%=orderId%></h2>
+            <p><strong>Name:</strong> <%=name%></p>
+            <p><strong>Email:</strong> <%=email%></p>
+            <p><strong>Phone:</strong> <%=phone%></p>
+            <p><strong>Address:</strong> <%=address%></p>
+            <p><strong>Total Amount:</strong> $<%=String.format("%.2f", totalAmount)%></p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Price (each)</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+            <%
+                // Query order items for this order
+                String sqlItems = "SELECT * FROM order_items WHERE order_id = ?";
+                psItems = conn.prepareStatement(sqlItems);
+                psItems.setInt(1, orderId);
+                rsItems = psItems.executeQuery();
+
+                while (rsItems.next()) {
+                    int productId = rsItems.getInt("product_id");
+                    String productName = rsItems.getString("product_name");
+                    double price = rsItems.getDouble("price");
+                    int quantity = rsItems.getInt("quantity");
+                    double subtotal = price * quantity;
+            %>
+                <tr>
+                    <td><%=productId%></td>
+                    <td><%=productName%></td>
+                    <td>$<%=String.format("%.2f", price)%></td>
+                    <td><%=quantity%></td>
+                    <td>$<%=String.format("%.2f", subtotal)%></td>
+                </tr>
+            <%
+                }
+                rsItems.close();
+                psItems.close();
+            %>
+            </tbody>
+        </table>
+    </div>
+<%
+        }
+    } catch(Exception e) {
+        out.println("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+        e.printStackTrace();
+    } finally {
+        try {
+            if(rsOrders != null) rsOrders.close();
+            if(psOrders != null) psOrders.close();
+            if(conn != null) conn.close();
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+%>
+
+</body>
+</html>

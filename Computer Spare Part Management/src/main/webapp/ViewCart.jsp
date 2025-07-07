@@ -1,0 +1,323 @@
+<%@ page import="java.util.*, ComputerPackage.CartItem" %>
+<%@ page session="true" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Your Cart - TechParts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9fafb;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            color: #2563eb;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropbtn {
+            cursor: pointer;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 220px;
+            top: 30px;
+            left: 0;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+            border-radius: 6px;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .cart {
+            position: relative;
+            font-size: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: red;
+            color: white;
+            font-size: 10px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .login-btn a {
+            background: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1f2937;
+            margin-top: 30px;
+        }
+
+        table {
+            width: 90%;
+            margin: 30px auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        img {
+            width: 80px;
+            height: auto;
+        }
+
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+        }
+
+        .qty-form button {
+            padding: 2px 8px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            background-color: #d1d5db;
+            cursor: pointer;
+        }
+
+        .qty-form button:hover {
+            background-color: #9ca3af;
+        }
+
+        .total {
+            text-align: right;
+            width: 90%;
+            margin: 20px auto;
+            font-size: 18px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 220px;
+            margin: 20px auto;
+            background-color: #10b981;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .checkout-btn:hover {
+            background-color: #059669;
+        }
+
+        .empty-message {
+            text-align: center;
+            margin-top: 100px;
+            font-size: 20px;
+            color: #6b7280;
+        }
+
+        .empty-message a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .empty-message a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ✅ Navbar -->
+<div class="header">
+    <div class="logo">
+        <img src="images/logo.png" alt="logo" width="40" height="40">
+        <h2>TechParts</h2>
+    </div>
+    <div class="nav-links">
+        <a href="Home.jsp">Home</a>
+        <a href="AboutUs.jsp">About Us</a>
+        <div class="dropdown">
+            <span class="dropbtn">All Products</span>
+            <div class="dropdown-content">
+                <a href="Laptops.jsp">Laptops</a>
+                <a href="laptopAccessories.jsp">Laptop Accessories</a>
+                <a href="desktopAccessories.jsp">Desktop & Accessories</a>
+                <a href="cctv.jsp">CCTV Camera & Accessories</a>
+                <a href="cameraItems.jsp">Camera Items</a>
+                <a href="printers.jsp">Printers</a>
+                <a href="giftVouchers.jsp">Gift Vouchers</a>
+            </div>
+        </div>
+        <a href="Services.jsp">Services</a>
+        <a href="Paymentmethod.jsp">Payment Methods</a>
+        <a href="Contactus.jsp">Contact Us</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="ViewCart.jsp" class="cart">
+            🛒
+            <%
+                List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+                int count = 0;
+                if (cart != null) {
+                    for (CartItem item : cart) {
+                        count += item.getQuantity();
+                    }
+                }
+            %>
+            <span class="cart-count"><%= count %></span>
+        </a>
+        <div class="login-btn">
+            <a href="Login.jsp">Login</a>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ Cart Content -->
+<h2>Your Shopping Cart</h2>
+
+<%
+    double total = 0;
+    if (cart != null && !cart.isEmpty()) {
+%>
+    <table>
+        <tr>
+            <th>Image</th>
+            <th>Product</th>
+            <th>Price (Rs)</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th>Action</th>
+        </tr>
+        <%
+            for (CartItem item : cart) {
+                double sub = item.getPrice() * item.getQuantity();
+                total += sub;
+        %>
+        <tr>
+            <td><img src="<%= item.getImage() %>" alt="Product"></td>
+            <td><%= item.getName() %></td>
+            <td><%= String.format("%.2f", item.getPrice()) %></td>
+            <td>
+                <form action="UpdateCartServlet" method="post" class="qty-form" style="display:inline;">
+                    <input type="hidden" name="id" value="<%= item.getId() %>">
+                    <input type="hidden" name="action" value="decrement">
+                    <button type="submit">-</button>
+                </form>
+                <span style="margin: 0 10px;"><%= item.getQuantity() %></span>
+                <form action="UpdateCartServlet" method="post" class="qty-form" style="display:inline;">
+                    <input type="hidden" name="id" value="<%= item.getId() %>">
+                    <input type="hidden" name="action" value="increment">
+                    <button type="submit">+</button>
+                </form>
+            </td>
+            <td><%= String.format("%.2f", sub) %></td>
+            <td>
+                <form action="RemoveFromCartServlet" method="post">
+                    <input type="hidden" name="id" value="<%= item.getId() %>">
+                    <button class="remove-btn" type="submit">Remove</button>
+                </form>
+            </td>
+        </tr>
+        <% } %>
+    </table>
+
+    <p class="total">Total: Rs. <%= String.format("%.2f", total) %></p>
+
+    <form action="Checkout.jsp">
+        <button class="checkout-btn">Proceed to Checkout</button>
+    </form>
+
+<% } else { %>
+    <div class="empty-message">
+        Your cart is empty. <br><br>
+        <a href="Laptops.jsp">Start Shopping →</a>
+    </div>
+<% } %>
+
+</body>
+</html>

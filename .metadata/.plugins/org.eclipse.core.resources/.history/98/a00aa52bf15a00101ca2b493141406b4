@@ -1,0 +1,249 @@
+<%@ page import="java.sql.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Reports - TechParts</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- html2canvas for capturing DOM as image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            background: #f8fafc;
+            display: flex;
+        }
+        .sidebar {
+            width: 230px;
+            background: #1e293b;
+            color: white;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100vh;
+        }
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+        }
+        .nav-link {
+            color: #cbd5e1;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: #2563eb;
+            color: white;
+        }
+        .logout-btn {
+            background: #ef4444;
+            padding: 0.75rem;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .main {
+            flex: 1;
+            padding: 2rem 3rem;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #1e293b;
+        }
+        .metrics {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .metric-card {
+            flex: 1;
+            min-width: 180px;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .metric-card h2 {
+            font-size: 2.5rem;
+            color: #2563eb;
+        }
+        .metric-card p {
+            margin-top: 0.5rem;
+            color: #475569;
+            font-weight: 600;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background: #f1f5f9;
+            color: #334155;
+        }
+        tbody tr:hover { background: #e0e7ff; }
+        .section-title {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+        }
+        .chart-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            margin-bottom: 3rem;
+        }
+        .btn-export {
+            background: #2563eb;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <div>
+        <h2>TechParts</h2>
+        <a href="ManagerDashboard.jsp" class="nav-link">Dashboard</a>
+        <a href="Categories.jsp" class="nav-link">Categories</a>
+        <a href="SupplierDetails.jsp" class="nav-link">Suppliers</a>
+        <a href="ViewOrderDetails.jsp" class="nav-link">Orders</a>
+        <a href="SalesDetails.jsp" class="nav-link">Sales</a>
+        <a href="Reports.jsp" class="nav-link active">Reports</a>
+        <a href="#" class="nav-link">Settings</a>
+    </div>
+    <button class="logout-btn" onclick="window.location.href='Login.jsp'">Logout</button>
+</div>
+<div class="main">
+    <h1>Reports Dashboard</h1>
+    <button class="btn-export" onclick="downloadPDF()">Export PDF</button>
+
+    <div class="metrics">
+        <div class="metric-card">
+            <h2><%= request.getAttribute("totalSuppliers") %></h2>
+            <p>Total Suppliers</p>
+        </div>
+        <div class="metric-card">
+            <h2><%= request.getAttribute("totalParts") %></h2>
+            <p>Total Parts</p>
+        </div>
+        <div class="metric-card">
+            <h2><%= request.getAttribute("totalOrders") %></h2>
+            <p>Total Orders</p>
+        </div>
+        <div class="metric-card">
+            <h2>$<%= request.getAttribute("totalSalesAmount") %></h2>
+            <p>Total Sales</p>
+        </div>
+    </div>
+
+    <h2 class="section-title">Top Customers by Email</h2>
+    <div class="chart-section">
+        <canvas id="customerSalesChart"></canvas>
+    </div>
+
+    <h2 class="section-title">Parts by Category</h2>
+    <div class="chart-section">
+        <canvas id="categoryChart"></canvas>
+    </div>
+</div>
+
+<script>
+function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const report = document.body;
+    html2canvas(report).then(canvas => {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "pt", "a4");
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = canvas.height * pdfWidth / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save("report.pdf");
+    });
+}
+
+// Charts data setup (replace with dynamic data if available)
+const ctxCustomer = document.getElementById('customerSalesChart').getContext('2d');
+const customerChart = new Chart(ctxCustomer, {
+    type: 'bar',
+    data: {
+        labels: <%= request.getAttribute("customerLabels") %>,
+        datasets: [{
+            label: 'Sales by Customer',
+            data: <%= request.getAttribute("customerSales") %>,
+            backgroundColor: '#2563eb'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: { display: true, text: 'Sales ($)' }
+            }
+        }
+    }
+});
+
+const ctxCategory = document.getElementById('categoryChart').getContext('2d');
+const categoryChart = new Chart(ctxCategory, {
+    type: 'pie',
+    data: {
+        labels: <%= request.getAttribute("categoryLabels") %>,
+        datasets: [{
+            data: <%= request.getAttribute("categoryCounts") %>,
+            backgroundColor: ['#2563eb', '#22c55e', '#ef4444', '#fbbf24', '#a855f7']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'right' },
+            tooltip: { enabled: true }
+        }
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<%@ page import="java.util.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shopping Cart - TechParts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            padding: 40px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #111827;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+        img.cart-image {
+            width: 80px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 6px;
+            font-size: 14px;
+            text-align: center;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 6px 12px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #1e40af;
+        }
+        .empty-msg {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 40px;
+            color: #555;
+        }
+        .total-row td {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .actions form {
+            display: inline-block;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Your Shopping Cart</h2>
+
+<%
+    List<HashMap<String, Object>> cart = (List<HashMap<String, Object>>) session.getAttribute("cart");
+    if (cart == null || cart.isEmpty()) {
+%>
+    <p class="empty-msg">Your cart is empty. <a href="Laptops.jsp">Go back to products.</a></p>
+<%
+    } else {
+        double total = 0;
+%>
+
+<table>
+    <tr>
+        <th>Image</th>
+        <th>Product Name</th>
+        <th>Price (LKR)</th>
+        <th>Quantity</th>
+        <th>Subtotal (LKR)</th>
+        <th>Actions</th>
+    </tr>
+
+    <% for (HashMap<String, Object> item : cart) {
+            double price = 0;
+            int quantity = 0;
+            try {
+                price = (Double) item.get("price");
+            } catch (Exception e) {
+                price = ((Number) item.get("price")).doubleValue();
+            }
+            try {
+                quantity = (Integer) item.get("quantity");
+            } catch (Exception e) {
+                quantity = ((Number) item.get("quantity")).intValue();
+            }
+            double subtotal = price * quantity;
+            total += subtotal;
+    %>
+    <tr>
+        <td>
+            <img src="<%= item.get("image") %>" alt="Product Image" class="cart-image" />
+        </td>
+        <td><%= item.get("name") %></td>
+        <td><%= String.format("%.2f", price) %></td>
+        <td>
+            <form action="UpdateCartServlet" method="post" style="display:inline;">
+                <input type="hidden" name="id" value="<%= item.get("id") %>" />
+                <input type="number" name="quantity" value="<%= quantity %>" min="1" />
+                <button type="submit">Update</button>
+            </form>
+        </td>
+        <td><%= String.format("%.2f", subtotal) %></td>
+        <td class="actions">
+            <form action="RemoveFromCartServlet" method="post">
+    <input type="hidden" name="id" value="<%= item.get("id") %>">
+    <input type="submit" value="Remove" onclick="return confirm('Are you sure you want to remove this item?');">
+</form>
+
+        </td>
+    </tr>
+    <% } %>
+
+    <tr class="total-row">
+        <td colspan="4" style="text-align:right;">Total:</td>
+        <td colspan="2">Rs. <%= String.format("%.2f", total) %></td>
+    </tr>
+</table>
+
+<br/>
+<div style="text-align:center;">
+    <a href="Checkout.jsp" style="padding: 10px 30px; background-color: #16a34a; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Proceed to Checkout</a>
+</div>
+
+<%
+    }
+%>
+
+</body>
+</html>

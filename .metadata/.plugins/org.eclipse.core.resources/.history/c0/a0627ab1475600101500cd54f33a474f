@@ -1,0 +1,136 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>About Us - TechParts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .about-container {
+            max-width: 1000px;
+            margin: 60px auto;
+            background-color: #ffffff;
+            padding: 40px 50px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .about-header h1 {
+            color: #1d4ed8;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .about-header p {
+            color: #555;
+            font-size: 18px;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .about-section {
+            margin-top: 40px;
+        }
+
+        .about-section h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .about-section p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-box {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .feature-box h3 {
+            color: #1d4ed8;
+            margin-bottom: 10px;
+        }
+
+        .feature-box p {
+            color: #444;
+            font-size: 15px;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="about-container">
+        <div class="about-header">
+            <h1>About TechParts</h1>
+            <p>Your one-stop solution for computer spare parts, accessories, and repair management.</p>
+        </div>
+
+        <div class="about-section">
+            <h2>Who We Are</h2>
+            <p>TechParts is a reliable and fast-growing platform for managing and sourcing a wide range of computer spare parts, components, and accessories. Whether you're an IT technician, business owner, or computer enthusiast, we’re here to help you find quality parts with ease.</p>
+
+            <h2>What We Offer</h2>
+            <div class="features-list">
+                <div class="feature-box">
+                    <h3>Inventory Management</h3>
+                    <p>Track stock levels, manage product availability, and prevent shortages.</p>
+                </div>
+                <div class="feature-box">
+                    <h3>Supplier Management</h3>
+                    <p>Connect and manage trusted suppliers for consistent product flow.</p>
+                </div>
+                <div class="feature-box">
+                    <h3>Order & Sales System</h3>
+                    <p>Handle orders efficiently and keep records of every transaction.</p>
+                </div>
+                <div class="feature-box">
+                    <h3>Finance Monitoring</h3>
+                    <p>Track your expenses and earnings to ensure financial stability.</p>
+                </div>
+            </div>
+
+            <h2>Our Mission</h2>
+            <p>To simplify and automate spare parts management while delivering exceptional service and reliability to our users.</p>
+
+            <h2>Contact Us</h2>
+            <p>Have questions or need support? Reach us at <strong>support@techparts.com</strong> or call <strong>+94 77 123 4567</strong>.</p>
+        </div>
+
+        <div class="footer-note">
+            &copy; 2025 TechParts System. All rights reserved.
+        </div>
+    </div>
+
+</body>
+</html>

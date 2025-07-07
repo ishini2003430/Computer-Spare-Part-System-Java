@@ -1,0 +1,176 @@
+<%@ page import="java.util.*, ComputerPackage.CartItem" %>
+<%@ page session="true" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout - TechParts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9fafb;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 30px;
+        }
+
+        form {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #374151;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #f3f4f6;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .total {
+            text-align: right;
+            font-size: 18px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .place-order-btn {
+            margin-top: 30px;
+            width: 100%;
+            background-color: #10b981;
+            color: white;
+            padding: 14px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .place-order-btn:hover {
+            background-color: #059669;
+        }
+
+        .empty-message {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 60px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Checkout</h2>
+
+    <%
+        List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+        double total = 0;
+        if (cart != null && !cart.isEmpty()) {
+    %>
+
+    <form action="PlaceOrderServlet" method="post">
+        <!-- Shipping Info -->
+        <div class="section">
+            <h3>Shipping Details</h3>
+            <label for="fullname">Full Name:</label>
+            <input type="text" name="fullname" id="fullname" required>
+
+            <label for="email">Email Address:</label>
+            <input type="email" name="email" id="email" required>
+
+            <label for="phone">Phone Number:</label>
+            <input type="text" name="phone" id="phone" required>
+
+            <label for="address">Shipping Address:</label>
+            <textarea name="address" id="address" rows="4" required></textarea>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="section">
+            <h3>Order Summary</h3>
+            <table>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                </tr>
+                <% for (CartItem item : cart) {
+                    double sub = item.getPrice() * item.getQuantity();
+                    total += sub;
+                %>
+                <tr>
+                    <td><%= item.getName() %></td>
+                    <td><%= item.getQuantity() %></td>
+                    <td>Rs. <%= String.format("%.2f", item.getPrice()) %></td>
+                    <td>Rs. <%= String.format("%.2f", sub) %></td>
+                </tr>
+                <% } %>
+            </table>
+            <p class="total">Total Amount: Rs. <%= String.format("%.2f", total) %></p>
+        </div>
+
+        <!-- Hidden total field -->
+        <input type="hidden" name="total" value="<%= String.format("%.2f", total) %>">
+
+        <button type="submit" class="place-order-btn">Place Order</button>
+    </form>
+
+    <% } else { %>
+        <div class="empty-message">
+            Your cart is empty.<br><br>
+            <a href="Laptops.jsp">Back to Shopping</a>
+        </div>
+    <% } %>
+
+</div>
+
+</body>
+</html>

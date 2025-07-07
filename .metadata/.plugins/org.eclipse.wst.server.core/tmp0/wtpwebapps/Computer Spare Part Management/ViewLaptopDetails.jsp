@@ -1,0 +1,90 @@
+<%@ page import="java.sql.*" %>
+<%
+    int id = Integer.parseInt(request.getParameter("id"));
+    Connection conn = null;
+    PreparedStatement pstmt = null;
+    ResultSet rs = null;
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Laptop Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            padding: 30px;
+        }
+        .details-container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .info p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 16px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<%
+    try {
+        Class.forName("com.mysql.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+        pstmt = conn.prepareStatement("SELECT * FROM laptops WHERE id = ?");
+        pstmt.setInt(1, id);
+        rs = pstmt.executeQuery();
+
+        if (rs.next()) {
+%>
+    <div class="details-container">
+        <img src="<%= rs.getString("image_url") %>" alt="Laptop Image" />
+        <h2><%= rs.getString("brand") %> <%= rs.getString("model") %></h2>
+        <div class="info">
+            <p><strong>CPU:</strong> <%= rs.getString("cpu") %></p>
+            <p><strong>GPU:</strong> <%= rs.getString("gpu") %></p>
+            <p><strong>RAM:</strong> <%= rs.getString("ram") %></p>
+            <p><strong>Price:</strong> Rs. <%= rs.getDouble("price") %></p>
+            <p><strong>Cash Price:</strong> Rs. <%= rs.getDouble("cash_price") %></p>
+            <p><strong>Status:</strong> <%= rs.getString("stock_status") %></p>
+            
+        </div>
+        <a href="Laptops.jsp" class="back-link">Back to Laptops</a>
+    </div>
+<%
+        } else {
+            out.print("<p>Laptop not found!</p>");
+        }
+    } catch (Exception e) {
+        out.print("Error: " + e.getMessage());
+    } finally {
+        if (rs != null) rs.close();
+        if (pstmt != null) pstmt.close();
+        if (conn != null) conn.close();
+    }
+%>
+</body>
+</html>

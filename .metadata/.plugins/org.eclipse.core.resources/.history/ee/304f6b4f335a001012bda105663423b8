@@ -1,0 +1,162 @@
+<%@ page import="java.sql.*" %>
+<%
+    String orderIdStr = request.getParameter("orderId");
+    if (orderIdStr == null || orderIdStr.trim().isEmpty()) {
+%>
+    <p style="color:red; font-weight:bold;">Order ID is missing. Please select a valid order.</p>
+    <% return; %>
+<%
+    }
+
+    int orderId = 0;
+    try {
+        orderId = Integer.parseInt(orderIdStr);
+    } catch (NumberFormatException e) {
+%>
+    <p style="color:red; font-weight:bold;">Invalid Order ID.</p>
+    <% return; %>
+<%
+    }
+
+    Connection conn = null;
+    PreparedStatement pstmtOrder = null;
+    PreparedStatement pstmtItems = null;
+    ResultSet rsOrder = null;
+    ResultSet rsItems = null;
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Details - TechParts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            padding: 30px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2563eb;
+            margin-bottom: 15px;
+        }
+        .order-info p {
+            font-size: 16px;
+            margin: 6px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #2563eb;
+            color: white;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 16px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<%
+    try {
+        Class.forName("com.mysql.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+        // Query order info
+        String orderSQL = "SELECT * FROM orders WHERE id = ?";
+        pstmtOrder = conn.prepareStatement(orderSQL);
+        pstmtOrder.setInt(1, orderId);
+        rsOrder = pstmtOrder.executeQuery();
+
+        if (!rsOrder.next()) {
+%>
+        <p style="color:red; font-weight:bold;">Order not found.</p>
+        <a href="OrdersList.jsp" class="back-link">Back to Orders List</a>
+<%
+        } else {
+%>
+        <h2>Order Details - Order #<%= orderId %></h2>
+        <div class="order-info">
+            <p><strong>Name:</strong> <%= rsOrder.getString("name") %></p>
+            <p><strong>Email:</strong> <%= rsOrder.getString("email") %></p>
+            <p><strong>Phone:</strong> <%= rsOrder.getString("phone") %></p>
+            <p><strong>Address:</strong> <%= rsOrder.getString("address") %></p>
+            <p><strong>Total Amount:</strong> Rs. <%= rsOrder.getDouble("total_amount") %></p>
+            <p><strong>Order Date:</strong> <%= rsOrder.getTimestamp("order_date") %></p>
+        </div>
+
+        <h3>Ordered Items</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Price (Rs.)</th>
+                    <th>Quantity</th>
+                    <th>Subtotal (Rs.)</th>
+                </tr>
+            </thead>
+            <tbody>
+<%
+            // Query order items
+            String itemsSQL = "SELECT * FROM order_items WHERE order_id = ?";
+            pstmtItems = conn.prepareStatement(itemsSQL);
+            pstmtItems.setInt(1, orderId);
+            rsItems = pstmtItems.executeQuery();
+
+            while (rsItems.next()) {
+                int productId = rsItems.getInt("product_id");
+                String productName = rsItems.getString("product_name");
+                double price = rsItems.getDouble("price");
+                int quantity = rsItems.getInt("quantity");
+                double subtotal = price * quantity;
+%>
+                <tr>
+                    <td><%= productId %></td>
+                    <td><%= productName %></td>
+                    <td><%= String.format("%.2f", price) %></td>
+                    <td><%= quantity %></td>
+                    <td><%= String.format("%.2f", subtotal) %></td>
+                </tr>
+<%
+            } // end while
+%>
+            </tbody>
+        </table>
+        <a href="OrdersList.jsp" class="back-link">Back to Orders List</a>
+<%
+        } // end else order found
+
+    } catch(Exception e) {
+        out.println("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+    } finally {
+        if (rsOrder != null) try { rsOrder.close(); } catch(Exception e) {}
+        if (pstmtOrder != null) try { pstmtOrder.close(); } catch(Exception e) {}
+        if (rsItems != null) try { rsItems.close(); } catch(Exception e) {}
+        if (pstmtItems != null) try { pstmtItems.close(); } catch(Exception e) {}
+        if (conn != null) try { conn.close(); } catch(Exception e) {}
+    }
+%>
+</div>
+</body>
+</html>

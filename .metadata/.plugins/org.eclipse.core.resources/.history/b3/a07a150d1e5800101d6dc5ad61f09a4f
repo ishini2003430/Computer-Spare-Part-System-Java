@@ -1,0 +1,73 @@
+package ComputerPackage;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+
+@WebServlet("/UpdateCctvAccessoryServlet")
+public class UpdateCctvAccessoryServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Get parameters from form
+        String idStr = request.getParameter("id");
+        String name = request.getParameter("name");
+        String item_code = request.getParameter("item_code");
+        String category = request.getParameter("category");
+        String priceStr = request.getParameter("price");
+        String cashPriceStr = request.getParameter("cash_price");
+        String stock_status = request.getParameter("stock_status");
+        String image_url = request.getParameter("image_url");
+        String description = request.getParameter("description");
+        String brand = request.getParameter("brand");
+
+        try {
+            int id = Integer.parseInt(idStr);
+            BigDecimal price = new BigDecimal(priceStr);
+            BigDecimal cash_price = new BigDecimal(cashPriceStr);
+
+            Class.forName("com.mysql.jdbc.Driver");  // or "com.mysql.cj.jdbc.Driver"
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+            String sql = "UPDATE cctvaccess SET name=?, item_code=?, category=?, price=?, cash_price=?, stock_status=?, image_url=?, description=?, brand=? WHERE id=?";
+            PreparedStatement pst = conn.prepareStatement(sql);
+
+            pst.setString(1, name);
+            pst.setString(2, item_code);
+            pst.setString(3, category);
+            pst.setBigDecimal(4, price);
+            pst.setBigDecimal(5, cash_price);
+            pst.setString(6, stock_status);
+            pst.setString(7, image_url);
+            pst.setString(8, description);
+            pst.setString(9, brand);
+            pst.setInt(10, id);
+
+            int updatedRows = pst.executeUpdate();
+
+            pst.close();
+            conn.close();
+
+            if (updatedRows > 0) {
+                // Redirect to product list or detail page after successful update
+                response.sendRedirect("ViewAccessories.jsp?message=Accessory+updated+successfully");
+            } else {
+                response.getWriter().println("Update failed. No rows affected.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().println("Error during update: " + e.getMessage());
+        }
+    }
+}

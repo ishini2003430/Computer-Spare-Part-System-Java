@@ -1,0 +1,364 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>About Us - TechParts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .about-container {
+            max-width: 1000px;
+            margin: 60px auto;
+            background-color: #ffffff;
+            padding: 40px 50px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .about-header h1 {
+            color: #1d4ed8;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .about-header p {
+            color: #555;
+            font-size: 18px;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .about-section {
+            margin-top: 40px;
+        }
+
+        .about-section h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .about-section p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-box {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .feature-box h3 {
+            color: #1d4ed8;
+            margin-bottom: 10px;
+        }
+
+        .feature-box p {
+            color: #444;
+            font-size: 15px;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            color: #2563eb;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+        }
+        .nav-links a.active-link {
+            color: #2563eb;
+           font-weight: bold;
+        }
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar input {
+            padding: 8px 32px 8px 30px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-bar::before {
+            content: '🔍';
+            position: absolute;
+            left: 10px;
+            top: 7px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .cart {
+            position: relative;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .cart::after {
+            content: '0';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: red;
+            color: white;
+            font-size: 10px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .login-btn a {
+            background: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 50px 80px;
+            background: #e8f0fc;
+        }
+
+        .text-content {
+            max-width: 50%;
+        }
+
+        .text-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .text-content .highlight {
+            color: #2563eb;
+        }
+
+        .text-content p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .btn.dark {
+            background-color: #0f172a;
+            color: white;
+        }
+
+        .btn.light {
+            background-color: white;
+            border: 1px solid #ccc;
+            color: #0f172a;
+        }
+
+        .image-content {
+            position: relative;
+        }
+         .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 220px;
+            top: 38px;
+            left: 0;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+            border-radius: 6px;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+                .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <img src="images/logo.png" alt="logo" width="40" height="40">
+        <h2>TechParts</h2>
+    </div>
+    <div class="nav-links">
+        <a href="Home.jsp">Home</a>
+        <a href="AboutUs.jsp">About Us</a>
+        <div class="dropdown">
+            <span class="dropbtn">All Products</span>
+            <div class="dropdown-content">
+                <a href="laptops.jsp">Laptops</a>
+                <a href="laptopAccessories.jsp">Laptop Accessories</a>
+                <a href="desktopAccessories.jsp">Desktop & Accessories</a>
+                <a href="cctv.jsp">CCTV Camera & Accessories</a>
+                <a href="cameraItems.jsp">Camera Items</a>
+                <a href="printers.jsp">Printers</a>
+                <a href="giftVouchers.jsp">Gift Vouchers</a>
+            </div>
+        </div>
+
+        <a href="services.jsp">Services</a>
+        <a href="payment.jsp">Payment Methods</a>
+        <a href="contact.jsp">Contact Us</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="search-bar">
+            <input type="text" placeholder="Search products...">
+        </div>
+        <div class="cart">🛒</div>
+        <div class="login-btn">
+            <a href="Login.jsp">Login</a>
+        </div>
+    </div>
+</div>
+
+    <div class="about-container">
+        <div class="about-header">
+            <h1>About TechParts</h1>
+            <p>Your one-stop solution for computer spare parts, accessories, and repair management.</p>
+        </div>
+
+        <div class="about-section">
+            <h2>Who We Are</h2>
+            <p>TechParts is a reliable and fast-growing platform for managing and sourcing a wide range of computer spare parts, components, and accessories. Whether you're an IT technician, business owner, or computer enthusiast, we’re here to help you find quality parts with ease.</p>
+
+            <h2>What We Offer</h2>
+            <div class="features-list">
+                <div class="feature-box">
+                    <h3>Inventory Management</h3>
+                    <p>Track stock levels, manage product availability, and prevent shortages.</p>
+                </div>
+                <div class="feature-box">
+                    <h3>Supplier Management</h3>
+                    <p>Connect and manage trusted suppliers for consistent product flow.</p>
+                </div>
+                <div class="feature-box">
+                    <h3>Order & Sales System</h3>
+                    <p>Handle orders efficiently and keep records of every transaction.</p>
+                </div>
+                <div class="feature-box">
+                    <h3>Finance Monitoring</h3>
+                    <p>Track your expenses and earnings to ensure financial stability.</p>
+                </div>
+            </div>
+
+            <h2>Our Mission</h2>
+            <p>To simplify and automate spare parts management while delivering exceptional service and reliability to our users.</p>
+
+            <h2>Contact Us</h2>
+            <p>Have questions or need support? Reach us at <strong>support@techparts.com</strong> or call <strong>+94 77 123 4567</strong>.</p>
+        </div>
+
+        <div class="footer-note">
+            &copy; 2025 TechParts System. All rights reserved.
+        </div>
+    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	  const dropdown = document.querySelector('.dropdown');
+	  const dropbtn = dropdown.querySelector('.dropbtn');
+
+	  dropbtn.addEventListener('click', function(e) {
+	    e.stopPropagation();
+	    dropdown.classList.toggle('show');
+	  });
+
+	  document.addEventListener('click', function() {
+	    dropdown.classList.remove('show');
+	  });
+	});
+
+</script>
+</body>
+</html>

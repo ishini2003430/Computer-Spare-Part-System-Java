@@ -1,0 +1,260 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Services - TechParts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            color: #2563eb;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a, .dropbtn {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-links a.active-link {
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 220px;
+            top: 38px;
+            left: 0;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+            border-radius: 6px;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .dropdown.show .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .search-bar input {
+            padding: 8px 32px 8px 30px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .cart {
+            position: relative;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .cart::after {
+            content: '0';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: red;
+            color: white;
+            font-size: 10px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .login-btn a {
+            background: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 40px 0;
+            font-size: 2.5rem;
+            color: #0f172a;
+        }
+
+        h2 {
+            color: #2563eb;
+            font-size: 1.8rem;
+            margin-top: 30px;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        footer {
+            background-color: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <img src="images/logo.png" alt="logo" width="40" height="40">
+        <h2>TechParts</h2>
+    </div>
+    <div class="nav-links">
+        <a href="Home.jsp">Home</a>
+        <a href="AboutUs.jsp">About Us</a>
+        <div class="dropdown">
+            <span class="dropbtn">All Products</span>
+            <div class="dropdown-content">
+                <a href="Laptops.jsp">Laptops</a>
+                <a href="LaptopAccessories.jsp">Laptop Accessories</a>
+                <a href="computerAccessories.jsp">Desktop & Accessories</a>
+                <a href="cctvcamera.jsp">CCTV Camera & Accessories</a>
+               
+                <a href="printers.jsp">Printers</a>
+              
+        </div>
+        <a class="active-link" href="Services.jsp">Services</a>
+        <a href="Paymentmethod.jsp">Payment Methods</a>
+        <a href="contact.jsp">Contact Us</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="search-bar">
+            <input type="text" placeholder="Search products...">
+        </div>
+        <div class="cart">🛒</div>
+        <div class="login-btn">
+            <a href="Login.jsp">Login</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h1>Our Services</h1>
+
+    <h2>Warranty</h2>
+    <p>Tech Parts Computers’ Warranty Section provides a customer-friendly service assuring the customer gets a fair experience.</p>
+    <ul>
+        <li>1. Warranty is only applicable under the Supplier’s terms.</li>
+        <li>2. Valid only within the invoice time period.</li>
+        <li>3. Not applicable for damage/corrosion.</li>
+        <li>4. Proof of purchase required.</li>
+        <li>5. Covers manufacturer defects only.</li>
+        <li>6. No warranty for software/data loss.</li>
+        <li>7. Battery & chargers: 1-year warranty.</li>
+        <li>8. Warranty codes: 01M, 01Y, NW, etc.</li>
+    </ul>
+
+    <h2>Pre Orders</h2>
+    <p>We help you get special components not found locally.</p>
+    <ul>
+        <li>1. 50% minimum advance payment required.</li>
+        <li>2. Advance payments are non-refundable.</li>
+    </ul>
+
+    <h2>Home Delivery</h2>
+    <p>Nationwide delivery available for all orders.</p>
+    <ul>
+        <li>1. Full payment required.</li>
+        <li>2. Payment via bank transfer only.</li>
+        <li>3. Delivery is outsourced to courier services.</li>
+        <li>4. Free delivery for orders over LKR 100,000.</li>
+    </ul>
+
+    <h2>Our Branches</h2>
+    <p>
+        Tech Part Computers (Pvt) Ltd<br>
+        Head Office & Stores<br>
+        #87/6, Kaluwalla,<br>
+        Galle, Sri Lanka.<br>
+        +94 91 2222545 | +94 917824780
+    </p>
+</div>
+
+<footer>
+    &copy; 2025 TechParts. All Rights Reserved.
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdown = document.querySelector('.dropdown');
+        const dropbtn = dropdown.querySelector('.dropbtn');
+
+        dropbtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdown.classList.toggle('show');
+        });
+
+        document.addEventListener('click', function() {
+            dropdown.classList.remove('show');
+        });
+    });
+</script>
+</body>
+</html>

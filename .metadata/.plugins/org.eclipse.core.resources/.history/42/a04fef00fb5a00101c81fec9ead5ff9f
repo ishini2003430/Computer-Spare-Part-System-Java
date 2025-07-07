@@ -1,0 +1,111 @@
+package ComputerPackage;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.*;
+
+@WebServlet("/ExportReportPDFServlet")
+public class ExportReportPDFServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=report.pdf");
+
+        Document document = new Document();
+        try {
+            PdfWriter.getInstance(document, response.getOutputStream());
+            document.open();
+
+            // Title
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.BLACK);
+            Paragraph title = new Paragraph("TechParts Report Summary", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(20);
+            document.add(title);
+
+            // Connect to DB
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+            Statement stmt = conn.createStatement();
+
+            // Metrics: Suppliers, Parts, Orders, Sales
+            int suppliers = 0, parts = 0, orders = 0;
+            double sales = 0.0;
+
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM suppliers");
+            if (rs.next()) suppliers = rs.getInt(1);
+
+            rs = stmt.executeQuery("SELECT COUNT(*) FROM parts");
+            if (rs.next()) parts = rs.getInt(1);
+
+            rs = stmt.executeQuery("SELECT COUNT(*) FROM orders");
+            if (rs.next()) orders = rs.getInt(1);
+
+            rs = stmt.executeQuery("SELECT IFNULL(SUM(total_amount), 0) FROM orders");
+            if (rs.next()) sales = rs.getDouble(1);
+
+            // Summary Table
+            PdfPTable summary = new PdfPTable(2);
+            summary.setWidthPercentage(100);
+            summary.setSpacingBefore(10);
+
+            summary.addCell(getCell("Total Suppliers", PdfPCell.ALIGN_LEFT));
+            summary.addCell(getCell(String.valueOf(suppliers), PdfPCell.ALIGN_RIGHT));
+
+            summary.addCell(getCell("Total Parts", PdfPCell.ALIGN_LEFT));
+            summary.addCell(getCell(String.valueOf(parts), PdfPCell.ALIGN_RIGHT));
+
+            summary.addCell(getCell("Total Orders", PdfPCell.ALIGN_LEFT));
+            summary.addCell(getCell(String.valueOf(orders), PdfPCell.ALIGN_RIGHT));
+
+            summary.addCell(getCell("Total Sales ($)", PdfPCell.ALIGN_LEFT));
+            summary.addCell(getCell(String.format("%.2f", sales), PdfPCell.ALIGN_RIGHT));
+
+            document.add(summary);
+
+            // New Section - Top Ordered Products
+            Paragraph topProductsHeader = new Paragraph("\nTop Ordered Products", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14));
+            topProductsHeader.setSpacingBefore(20);
+            topProductsHeader.setSpacingAfter(10);
+            document.add(topProductsHeader);
+
+            PdfPTable table = new PdfPTable(2);
+            table.setWidthPercentage(100);
+            table.addCell("Product Name");
+            table.addCell("Total Quantity");
+
+            rs = stmt.executeQuery("SELECT product_name, SUM(quantity) as total FROM order_items GROUP BY product_name ORDER BY total DESC LIMIT 10");
+            while (rs.next()) {
+                table.addCell(rs.getString("product_name"));
+                table.addCell(String.valueOf(rs.getInt("total")));
+            }
+
+            document.add(table);
+
+            rs.close();
+            stmt.close();
+            conn.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Error generating PDF: " + e.getMessage());
+        } finally {
+            document.close();
+        }
+    }
+
+    private PdfPCell getCell(String text, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setPadding(10);
+        cell.setHorizontalAlignment(alignment);
+        cell.setBorderWidth(0.5f);
+        return cell;
+    }
+}

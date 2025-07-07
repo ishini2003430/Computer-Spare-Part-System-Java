@@ -1,0 +1,65 @@
+<%@ page import="java.sql.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Laptops</title>
+    <style>
+        body { font-family: Arial; background: #f9f9f9; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { padding: 12px; border: 1px solid #ccc; text-align: left; }
+        th { background: #111827; color: white; }
+        a { text-decoration: none; color: #2563eb; margin: 0 5px; }
+    </style>
+</head>
+<body>
+    <h2>All Laptops</h2>
+    <a href="AddLaptop.jsp">+ Add New Laptop</a>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>CPU</th>
+            <th>GPU</th>
+            <th>RAM</th>
+            <th>Storage</th>
+            <th>Display</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Actions</th>
+        </tr>
+        <%
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+                Statement st = conn.createStatement();
+                ResultSet rs = st.executeQuery("SELECT * FROM laptops");
+
+                while (rs.next()) {
+        %>
+        <tr>
+            <td><%= rs.getInt("id") %></td>
+            <td><%= rs.getString("brand") %></td>
+            <td><%= rs.getString("model") %></td>
+            <td><%= rs.getString("cpu") %></td>
+            <td><%= rs.getString("gpu") %></td>
+            <td><%= rs.getString("ram") %></td>
+            <td><%= rs.getString("storage") %></td>
+            <td><%= rs.getString("display") %></td>
+            <td>$<%= rs.getDouble("price") %></td>
+            <td><%= rs.getString("stock_status") %></td>
+            <td>
+                <a href="EditLaptop.jsp?id=<%= rs.getInt("id") %>">Edit</a>
+                <a href="DeleteLaptopServlet?id=<%= rs.getInt("id") %>" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+        <%
+                }
+                conn.close();
+            } catch (Exception e) {
+                out.print("Error: " + e.getMessage());
+            }
+        %>
+    </table>
+</body>
+</html>

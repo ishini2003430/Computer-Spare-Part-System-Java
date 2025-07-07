@@ -1,0 +1,50 @@
+package ComputerPackage;
+
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.sql.*;
+
+@WebServlet("/AddPrinterServlet")
+public class AddPrinterServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Get form data
+        String model = request.getParameter("model_name");
+        String brand = request.getParameter("brand");
+        String type = request.getParameter("type");
+        String priceStr = request.getParameter("price");
+        String cashPriceStr = request.getParameter("cash_price");
+        String status = request.getParameter("stock_status");
+        String desc = request.getParameter("description");
+
+        try {
+            double price = Double.parseDouble(priceStr);
+            double cashPrice = Double.parseDouble(cashPriceStr);
+
+            // DB connection
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+            String sql = "INSERT INTO printers (model_name, brand, type, price, cash_price, stock_status, description) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, model);
+            ps.setString(2, brand);
+            ps.setString(3, type);
+            ps.setDouble(4, price);
+            ps.setDouble(5, cashPrice);
+            ps.setString(6, status);
+            ps.setString(7, desc);
+
+            ps.executeUpdate();
+
+            // Redirect to view page
+            response.sendRedirect("viewprinters.jsp");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().println("Error: " + e.getMessage());
+        }
+    }
+}

@@ -1,0 +1,181 @@
+<%@ page import="java.sql.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Laptops - TechParts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .top-bar {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .top-bar select, .top-bar input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .laptop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card img {
+            width: 100%;
+            height: 160px;
+            object-fit: contain;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            margin: 10px 0 5px;
+        }
+
+        .price, .cash-price {
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .price {
+            color: #e11d48;
+        }
+
+        .cash-price {
+            color: #16a34a;
+        }
+
+        .status {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+
+        .in-stock {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .low-stock {
+            background-color: #facc15;
+            color: black;
+        }
+
+        .out-stock {
+            background-color: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h2>ALL LAPTOPS</h2>
+
+    <div class="top-bar">
+        <input type="text" id="searchInput" placeholder="Search by Model or Brand..." onkeyup="filterLaptops()">
+        <select id="brandFilter" onchange="filterLaptops()">
+            <option value="">Choose by Brand</option>
+            <option value="Asus">Asus</option>
+            <option value="HP">HP</option>
+            <option value="Dell">Dell</option>
+            <option value="Acer">Acer</option>
+        </select>
+        <select id="ramFilter" onchange="filterLaptops()">
+            <option value="">Choose by RAM</option>
+            <option value="8GB">8GB</option>
+            <option value="16GB">16GB</option>
+            <option value="32GB">32GB</option>
+        </select>
+    </div>
+
+    <div class="laptop-grid" id="laptopGrid">
+        <% 
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM laptops");
+            while (rs.next()) {
+                String statusClass = "in-stock";
+                String stockStatus = rs.getString("stock_status");
+                if(stockStatus.equalsIgnoreCase("Low Stock")) statusClass = "low-stock";
+                else if(stockStatus.equalsIgnoreCase("Out of Stock")) statusClass = "out-stock";
+        %>
+            <div class="card" data-brand="<%= rs.getString("brand") %>" data-ram="<%= rs.getString("ram") %>" data-model="<%= rs.getString("model") %>">
+                <img src="<%= rs.getString("image_url") %>" alt="Laptop Image">
+                <h3><%= rs.getString("brand") %> <%= rs.getString("model") %></h3>
+                <p><%= rs.getString("cpu") %> | <%= rs.getString("gpu") %></p>
+                <p class="price">Rs. <%= rs.getDouble("price") %></p>
+                <p class="cash-price">Cash Price: Rs. <%= rs.getDouble("cash_price") %></p>
+                <span class="status <%= statusClass %>"><%= stockStatus %></span>
+            </div>
+        <% 
+            } 
+            conn.close();
+        } catch(Exception e) {
+            out.print("Error: " + e.getMessage());
+        }
+        %>
+    </div>
+
+    <script>
+        function filterLaptops() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const brand = document.getElementById("brandFilter").value.toLowerCase();
+            const ram = document.getElementById("ramFilter").value.toLowerCase();
+            const cards = document.querySelectorAll(".card");
+
+            cards.forEach(card => {
+                const model = card.dataset.model.toLowerCase();
+                const cardBrand = card.dataset.brand.toLowerCase();
+                const cardRam = card.dataset.ram.toLowerCase();
+
+                const matchesSearch = model.includes(input) || cardBrand.includes(input);
+                const matchesBrand = brand === "" || cardBrand === brand;
+                const matchesRam = ram === "" || cardRam === ram;
+
+                if (matchesSearch && matchesBrand && matchesRam) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+    </script>
+</body>
+</html>

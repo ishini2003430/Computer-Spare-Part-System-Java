@@ -1,0 +1,33 @@
+package ComputerPackage;
+
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.SQLException;
+
+@WebServlet("/addPart")
+public class AddPartServlet extends HttpServlet {
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String name = request.getParameter("part_name");
+        String category = request.getParameter("category");
+        String supplier = request.getParameter("supplier");
+        int quantity = Integer.parseInt(request.getParameter("quantity"));
+        int minStock = Integer.parseInt(request.getParameter("min_stock"));
+        double price = Double.parseDouble(request.getParameter("price"));
+
+        Part part = new Part(name, category, supplier, quantity, minStock, price);
+        PartDAO dao = new PartDAO();
+
+        try {
+            dao.addPart(part);
+            response.sendRedirect("listParts.jsp"); // Redirect to the parts list page after adding
+        } catch (SQLException e) {
+            e.printStackTrace();
+            response.sendRedirect("error.jsp");
+        }
+    }
+}

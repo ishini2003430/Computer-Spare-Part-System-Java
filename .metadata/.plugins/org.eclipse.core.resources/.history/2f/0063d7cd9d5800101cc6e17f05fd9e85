@@ -1,0 +1,299 @@
+<%@ page import="java.sql.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CCTV Accessories - TechParts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            color: #2563eb;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .nav-links a.active-link {
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropbtn {
+            cursor: pointer;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 220px;
+            top: 30px;
+            left: 0;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+            border-radius: 6px;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .cart {
+            position: relative;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .cart::after {
+            content: '0';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: red;
+            color: white;
+            font-size: 10px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .login-btn a {
+            background: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1f2937;
+            margin: 30px 0 20px;
+        }
+
+        .add-button {
+            display: inline-block;
+            margin: 0 0 20px 20px;
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 18px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .add-button:hover {
+            background-color: #1e40af;
+        }
+
+        table {
+            width: 95%;
+            margin: 0 auto 30px;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background-color: #111827;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .actions a {
+            padding: 6px 12px;
+            margin-right: 8px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            color: white;
+        }
+
+        .edit-btn {
+            background-color: #10b981;
+        }
+
+        .delete-btn {
+            background-color: #ef4444;
+        }
+
+        .image-thumb {
+            width: 60px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .desc-cell {
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="header">
+    <div class="logo">
+        <img src="images/logo.png" alt="logo" width="40" height="40">
+        <h2>TechParts</h2>
+    </div>
+    <div class="nav-links">
+        <a href="Home.jsp">Home</a>
+        <a href="AboutUs.jsp">About Us</a>
+        <div class="dropdown">
+            <span class="dropbtn">All Products</span>
+            <div class="dropdown-content">
+                <a href="Laptops.jsp">Laptops</a>
+                <a href="laptopAccessories.jsp">Laptop Accessories</a>
+                <a href="desktopAccessories.jsp">Desktop & Accessories</a>
+                <a href="cctvcamera.jsp" class="active-link">CCTV Camera & Accessories</a>
+               
+                <a href="printers.jsp">Printers</a>
+            </div>
+        </div>
+        <a href="Services.jsp">Services</a>
+        <a href="Paymentmethod.jsp">Payment Methods</a>
+        <a href="Contactus.jsp">Contact Us</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="cart">🛒</div>
+        <div class="login-btn">
+            <a href="Login.jsp">Login</a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div style="display: flex; justify-content: space-between; padding: 0 20px; margin-top: 20px;">
+    <a href="Categories.jsp" class="add-button" style="background-color: #6b7280;">Back to Categories</a>
+    <a href="AddCCTVAcces.jsp" class="add-button">Add CCTV Accessory</a>
+</div>
+
+<h2>CCTV Accessories List</h2>
+
+<%
+    try {
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT * FROM cctvaccess WHERE category='CCTV Accessory'");
+
+        if (rs.next()) {
+%>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Image</th>
+        <th>Item Code</th>
+        <th>Name</th>
+        <th>Brand</th>
+        <th>Price</th>
+        <th>Cash Price</th>
+        <th>Status</th>
+        <th>Description</th>
+        <th>Actions</th>
+    </tr>
+    <%
+        do {
+    %>
+    <tr>
+        <td><%= rs.getInt("id") %></td>
+        <td><img src="<%= rs.getString("image_url") %>" alt="Image" class="image-thumb"></td>
+        <td><%= rs.getString("item_code") %></td>
+        <td><%= rs.getString("name") %></td>
+        <td><%= rs.getString("brand") %></td>
+        <td>Rs. <%= rs.getDouble("price") %></td>
+        <td>Rs. <%= rs.getDouble("cash_price") %></td>
+        <td><%= rs.getString("stock_status") %></td>
+        <td class="desc-cell"><%= rs.getString("description") %></td>
+        <td class="actions">
+            <a href="EditCctvAccessory.jsp?id=<%= rs.getInt("id") %>" class="edit-btn">Edit</a>
+            <a href="DeleteCctvAccessServlet?id=<%= rs.getInt("id") %>" class="delete-btn" onclick="return confirm('Are you sure you want to delete this accessory?');">Delete</a>
+        </td>
+    </tr>
+    <%
+        } while (rs.next());
+    %>
+</table>
+<%
+    } else {
+        out.println("<p style='text-align:center;'>No CCTV accessories found.</p>");
+    }
+
+    rs.close();
+    stmt.close();
+    conn.close();
+} catch (Exception e) {
+    out.println("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+}
+%>
+
+</body>
+</html>

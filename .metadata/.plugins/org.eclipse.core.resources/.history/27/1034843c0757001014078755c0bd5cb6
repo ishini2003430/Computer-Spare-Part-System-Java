@@ -1,0 +1,107 @@
+package ComputerPackage;
+
+import java.sql.*;
+import java.util.*;
+
+public class PartDAO {
+
+    private final String jdbcURL = "jdbc:mysql://localhost:3306/computer";
+    private final String jdbcUsername = "root";
+    private final String jdbcPassword = "ishini2003"; // update if needed
+
+    private Connection getConnection() throws SQLException {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new SQLException(e);
+        }
+        return DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+    }
+
+    // 1. Add Part
+    public void addPart(Part part) throws SQLException {
+        String sql = "INSERT INTO part (part_name, category, supplier, quantity, min_stock, price) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, part.getPartName());
+            ps.setString(2, part.getCategory());
+            ps.setString(3, part.getSupplier());
+            ps.setInt(4, part.getQuantity());
+            ps.setInt(5, part.getMinStock());
+            ps.setDouble(6, part.getPrice());
+            ps.executeUpdate();
+        }
+    }
+
+    // 2. Get All Parts
+    public List<Part> getAllParts() throws SQLException {
+        List<Part> parts = new ArrayList<>();
+        String sql = "SELECT * FROM part";
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Part p = new Part(
+                        rs.getInt("id"),
+                        rs.getString("part_name"),
+                        rs.getString("category"),
+                        rs.getString("supplier"),
+                        rs.getInt("quantity"),
+                        rs.getInt("min_stock"),
+                        rs.getDouble("price")
+                );
+                parts.add(p);
+            }
+        }
+        return parts;
+    }
+
+    // 3. Get Single Part by ID
+    public Part getPartById(int id) throws SQLException {
+        Part part = null;
+        String sql = "SELECT * FROM part WHERE id=?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                part = new Part(
+                        rs.getInt("id"),
+                        rs.getString("part_name"),
+                        rs.getString("category"),
+                        rs.getString("supplier"),
+                        rs.getInt("quantity"),
+                        rs.getInt("min_stock"),
+                        rs.getDouble("price")
+                );
+            }
+        }
+        return part;
+    }
+
+    // 4. Update Part
+    public void updatePart(Part part) throws SQLException {
+        String sql = "UPDATE part SET part_name=?, category=?, supplier=?, quantity=?, min_stock=?, price=? WHERE id=?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, part.getPartName());
+            ps.setString(2, part.getCategory());
+            ps.setString(3, part.getSupplier());
+            ps.setInt(4, part.getQuantity());
+            ps.setInt(5, part.getMinStock());
+            ps.setDouble(6, part.getPrice());
+            ps.setInt(7, part.getId());
+            ps.executeUpdate();
+        }
+    }
+
+    // 5. Delete Part
+    public void deletePart(int id) throws SQLException {
+        String sql = "DELETE FROM part WHERE id=?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        }
+    }
+}

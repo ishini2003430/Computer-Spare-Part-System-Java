@@ -1,0 +1,103 @@
+<%@ page import="java.sql.*" %>
+<%
+    int id = Integer.parseInt(request.getParameter("id"));
+    Connection conn = null;
+    PreparedStatement pstmt = null;
+    ResultSet rs = null;
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Printer Details - TechParts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f3f4f6;
+            padding: 40px;
+        }
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #1e3a8a;
+            margin-bottom: 25px;
+        }
+        img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .info p {
+            font-size: 16px;
+            margin: 8px 0;
+        }
+        .info p span {
+            font-weight: bold;
+            color: #111827;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .back-link:hover {
+            background-color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+
+<%
+    try {
+        Class.forName("com.mysql.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+        pstmt = conn.prepareStatement("SELECT * FROM printers WHERE id = ?");
+        pstmt.setInt(1, id);
+        rs = pstmt.executeQuery();
+
+        if (rs.next()) {
+%>
+<div class="container">
+    <img src="<%= rs.getString("image_url") %>" alt="Printer Image" />
+    <h2><%= rs.getString("model_name") %> - <%= rs.getString("brand") %></h2>
+
+    <div class="info">
+        <p><span>Item Code:</span> <%= rs.getString("item_code") %></p>
+        <p><span>Type:</span> <%= rs.getString("type") %></p>
+        <p><span>Price:</span> Rs. <%= String.format("%.2f", rs.getDouble("price")) %></p>
+        <p><span>Cash Price:</span> Rs. <%= String.format("%.2f", rs.getDouble("cash_price")) %></p>
+        <p><span>Status:</span> <%= rs.getString("status") %></p>
+        <p><span>Description:</span> <%= rs.getString("description") %></p>
+    </div>
+
+    <a href="printers.jsp" class="back-link">Back to Printer List</a>
+</div>
+<%
+        } else {
+            out.println("<p style='color:red; text-align:center;'>Printer not found!</p>");
+        }
+
+        rs.close();
+        pstmt.close();
+        conn.close();
+    } catch (Exception e) {
+        out.println("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+    }
+%>
+
+</body>
+</html>

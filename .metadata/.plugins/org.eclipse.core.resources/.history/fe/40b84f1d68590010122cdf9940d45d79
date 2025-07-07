@@ -1,0 +1,56 @@
+package ComputerPackage;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+@WebServlet("/RemoveFromCartServlet")
+public class RemoveFromCartServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idStr = request.getParameter("id");
+        if (idStr == null || idStr.isEmpty()) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+        
+        int id;
+        try {
+            id = Integer.parseInt(idStr);
+        } catch (NumberFormatException e) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+        
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+        
+        List<HashMap<String, Object>> cart = (List<HashMap<String, Object>>) session.getAttribute("cart");
+        if (cart != null) {
+            Iterator<HashMap<String, Object>> iterator = cart.iterator();
+            while (iterator.hasNext()) {
+                HashMap<String, Object> item = iterator.next();
+                try {
+                    int itemId = Integer.parseInt(item.get("id").toString());
+                    if (itemId == id) {
+                        iterator.remove();
+                        break;
+                    }
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
+            session.setAttribute("cart", cart);
+        }
+        
+        response.sendRedirect("ViewCart.jsp");
+    }
+}

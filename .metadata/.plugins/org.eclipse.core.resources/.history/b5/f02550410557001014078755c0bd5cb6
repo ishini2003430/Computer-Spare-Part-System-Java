@@ -1,0 +1,44 @@
+package ComputerPackage;
+
+
+
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+public class PartDBUtil {
+	
+	 // Database connection details
+    private static String url = "jdbc:mysql://localhost:3306/computer";
+    private static String user = "root";
+    private static String pass = "ishini2003";
+
+	
+	
+    public static boolean insertPart(Part part) {
+        boolean isSuccess = false;
+
+        try {
+            Connection conn = DBConnection.getConnection();
+            String sql = "INSERT INTO parts (name, category, supplier, quantity, min_stock, price) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setString(1, part.getName());
+            stmt.setString(2, part.getCategory());
+            stmt.setString(3, part.getSupplier());
+            stmt.setInt(4, part.getQuantity());
+            stmt.setInt(5, part.getMinStock());
+            stmt.setDouble(6, part.getPrice());
+
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) isSuccess = true;
+
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return isSuccess;
+    }
+}

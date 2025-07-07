@@ -1,0 +1,141 @@
+package ComputerPackage;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.draw.LineSeparator;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.*;
+
+@WebServlet("/ExportReportPDFServlet")
+public class ExportReportPDFServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=report.pdf");
+
+        Document document = new Document();
+        try {
+            PdfWriter.getInstance(document, response.getOutputStream());
+            document.open();
+
+            // ===== Title =====
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 22, BaseColor.DARK_GRAY);
+            Paragraph title = new Paragraph("📊 TechParts Report Summary", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            title.setSpacingAfter(10);
+            document.add(title);
+
+            LineSeparator ls = new LineSeparator();
+            ls.setLineColor(BaseColor.LIGHT_GRAY);
+            document.add(new Chunk(ls));
+            document.add(Chunk.NEWLINE);
+
+            // ===== DB Connection =====
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+            Statement stmt = conn.createStatement();
+
+            // ===== Metrics =====
+            int suppliers = 0, parts = 0, orders = 0;
+            double sales = 0.0;
+
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM suppliers");
+            if (rs.next()) suppliers = rs.getInt(1);
+
+            rs = stmt.executeQuery("SELECT COUNT(*) FROM parts");
+            if (rs.next()) parts = rs.getInt(1);
+
+            rs = stmt.executeQuery("SELECT COUNT(*) FROM orders");
+            if (rs.next()) orders = rs.getInt(1);
+
+            rs = stmt.executeQuery("SELECT IFNULL(SUM(total_amount), 0) FROM orders");
+            if (rs.next()) sales = rs.getDouble(1);
+
+            // ===== Summary Table =====
+            Paragraph summaryTitle = new Paragraph("🧾 Summary", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14));
+            summaryTitle.setSpacingAfter(10);
+            document.add(summaryTitle);
+
+            PdfPTable summary = new PdfPTable(2);
+            summary.setWidthPercentage(100);
+            summary.setSpacingBefore(5);
+            summary.setSpacingAfter(20);
+
+            Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+            BaseColor headerColor = new BaseColor(230, 230, 250); // light lavender
+
+            addCell(summary, "Metric", headFont, Element.ALIGN_CENTER, headerColor);
+            addCell(summary, "Value", headFont, Element.ALIGN_CENTER, headerColor);
+
+            addCell(summary, "Total Suppliers", null, Element.ALIGN_LEFT, null);
+            addCell(summary, String.valueOf(suppliers), null, Element.ALIGN_RIGHT, null);
+
+            addCell(summary, "Total Parts", null, Element.ALIGN_LEFT, null);
+            addCell(summary, String.valueOf(parts), null, Element.ALIGN_RIGHT, null);
+
+            addCell(summary, "Total Orders", null, Element.ALIGN_LEFT, null);
+            addCell(summary, String.valueOf(orders), null, Element.ALIGN_RIGHT, null);
+
+            addCell(summary, "Total Sales ($)", null, Element.ALIGN_LEFT, null);
+            addCell(summary, String.format("%.2f", sales), null, Element.ALIGN_RIGHT, null);
+
+            document.add(summary);
+
+            // ===== Top Products =====
+            Paragraph topTitle = new Paragraph("🔥 Top 10 Ordered Products", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14));
+            topTitle.setSpacingBefore(10);
+            topTitle.setSpacingAfter(10);
+            document.add(topTitle);
+
+            PdfPTable productTable = new PdfPTable(2);
+            productTable.setWidthPercentage(100);
+
+            addCell(productTable, "Product Name", headFont, Element.ALIGN_CENTER, BaseColor.LIGHT_GRAY);
+            addCell(productTable, "Total Quantity", headFont, Element.ALIGN_CENTER, BaseColor.LIGHT_GRAY);
+
+            rs = stmt.executeQuery("SELECT product_name, SUM(quantity) as total FROM order_items GROUP BY product_name ORDER BY total DESC LIMIT 10");
+
+            boolean alternate = false;
+            while (rs.next()) {
+                BaseColor bg = alternate ? new BaseColor(245, 245, 245) : BaseColor.WHITE;
+                addCell(productTable, rs.getString("product_name"), null, Element.ALIGN_LEFT, bg);
+                addCell(productTable, String.valueOf(rs.getInt("total")), null, Element.ALIGN_RIGHT, bg);
+                alternate = !alternate;
+            }
+
+            document.add(productTable);
+
+            rs.close();
+            stmt.close();
+            conn.close();
+
+            // ===== Footer =====
+            Paragraph footer = new Paragraph("\nGenerated by TechParts Inventory System", FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE, 10, BaseColor.GRAY));
+            footer.setAlignment(Element.ALIGN_CENTER);
+            footer.setSpacingBefore(30);
+            document.add(footer);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("Error generating PDF: " + e.getMessage());
+        } finally {
+            document.close();
+        }
+    }
+
+    private void addCell(PdfPTable table, String text, Font font, int align, BaseColor bg) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font != null ? font : FontFactory.getFont(FontFactory.HELVETICA, 11)));
+        cell.setPadding(10);
+        cell.setHorizontalAlignment(align);
+        if (bg != null) {
+            cell.setBackgroundColor(bg);
+        }
+        table.addCell(cell);
+    }
+}

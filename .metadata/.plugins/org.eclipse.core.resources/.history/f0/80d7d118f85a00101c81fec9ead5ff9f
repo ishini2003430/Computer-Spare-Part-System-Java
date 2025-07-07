@@ -1,0 +1,107 @@
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.*;
+import java.util.LinkedHashMap;
+
+@WebServlet("/ExportReportPDFServlet")
+public class ExportReportPDFServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=TechParts_Report.pdf");
+
+        try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, response.getOutputStream());
+            document.open();
+
+            // Title
+            Font titleFont = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, BaseColor.BLUE);
+            Paragraph title = new Paragraph("TechParts - Dashboard Report\n\n", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+
+            // Database connection
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+            Statement stmt = conn.createStatement();
+
+            // Metrics
+            int totalSuppliers = getCount(stmt, "SELECT COUNT(*) FROM suppliers");
+            int totalParts = getCount(stmt, "SELECT COUNT(*) FROM parts");
+            int totalOrders = getCount(stmt, "SELECT COUNT(*) FROM orders");
+            double totalSales = getDouble(stmt, "SELECT IFNULL(SUM(total_amount), 0) FROM orders");
+
+            document.add(new Paragraph("Summary Metrics", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+            document.add(new Paragraph("Suppliers: " + totalSuppliers));
+            document.add(new Paragraph("Parts: " + totalParts));
+            document.add(new Paragraph("Orders: " + totalOrders));
+            document.add(new Paragraph("Total Sales: $" + String.format("%.2f", totalSales)));
+            document.add(new Paragraph("\n"));
+
+            // Parts by Category
+            document.add(new Paragraph("Parts by Category", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+            PdfPTable categoryTable = new PdfPTable(2);
+            categoryTable.setWidthPercentage(100);
+            categoryTable.addCell("Category");
+            categoryTable.addCell("Total Parts");
+
+            ResultSet rs = stmt.executeQuery("SELECT category, COUNT(*) FROM parts GROUP BY category");
+            while (rs.next()) {
+                categoryTable.addCell(rs.getString(1));
+                categoryTable.addCell(String.valueOf(rs.getInt(2)));
+            }
+            document.add(categoryTable);
+            document.add(new Paragraph("\n"));
+
+            // Top 10 Ordered Products
+            document.add(new Paragraph("Top 10 Ordered Products", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+            PdfPTable topProducts = new PdfPTable(2);
+            topProducts.setWidthPercentage(100);
+            topProducts.addCell("Product Name");
+            topProducts.addCell("Total Quantity Ordered");
+
+            rs = stmt.executeQuery("SELECT product_name, SUM(quantity) AS total_quantity FROM order_items GROUP BY product_name ORDER BY total_quantity DESC LIMIT 10");
+            while (rs.next()) {
+                topProducts.addCell(rs.getString("product_name"));
+                topProducts.addCell(String.valueOf(rs.getInt("total_quantity")));
+            }
+            document.add(topProducts);
+
+            rs.close();
+            stmt.close();
+            conn.close();
+            document.close();
+
+        } catch (Exception e) {
+            throw new ServletException("Exception in PDF generation: " + e.getMessage(), e);
+        }
+    }
+
+    private int getCount(Statement stmt, String query) throws SQLException {
+        ResultSet rs = stmt.executeQuery(query);
+        int count = 0;
+        if (rs.next()) {
+            count = rs.getInt(1);
+        }
+        rs.close();
+        return count;
+    }
+
+    private double getDouble(Statement stmt, String query) throws SQLException {
+        ResultSet rs = stmt.executeQuery(query);
+        double value = 0.0;
+        if (rs.next()) {
+            value = rs.getDouble(1);
+        }
+        rs.close();
+        return value;
+    }
+}

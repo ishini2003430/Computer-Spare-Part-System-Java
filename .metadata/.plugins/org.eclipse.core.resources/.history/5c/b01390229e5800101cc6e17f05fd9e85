@@ -1,0 +1,170 @@
+<%@ page import="java.sql.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>CCTV Accessories - TechParts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+        }
+
+        .navbar {
+            background-color: #111827;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar .logo img {
+            width: 35px;
+            height: 35px;
+        }
+
+        .navbar .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card img {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            margin: 10px 0 5px;
+        }
+
+        .card p {
+            margin: 4px 0;
+            font-size: 14px;
+        }
+
+        .price { color: #e11d48; font-weight: bold; }
+        .cash-price { color: #16a34a; font-weight: bold; }
+
+        .buttons {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .buttons button {
+            padding: 7px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            color: white;
+        }
+
+        .add-cart { background-color: #6b7280; }
+        .view-more { background-color: #2563eb; }
+        .buy-now { background-color: #dc2626; }
+
+        .add-cart:hover { background-color: #4b5563; }
+        .view-more:hover { background-color: #1d4ed8; }
+        .buy-now:hover { background-color: #b91c1c; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <div class="logo">
+        <img src="images/logo.png" alt="logo">
+        <strong>TechParts</strong>
+    </div>
+    <div class="nav-links">
+        <a href="Home.jsp">Home</a>
+        <a href="AboutUs.jsp">About Us</a>
+        <a href="Laptops.jsp">Laptops</a>
+        <a href="laptopAccessories.jsp">Laptop Accessories</a>
+        <a href="cctvcamera.jsp">CCTV Accessories</a>
+        <a href="desktopAccessories.jsp">Desktop Accessories</a>
+        <a href="Contactus.jsp">Contact</a>
+    </div>
+</div>
+
+<div class="content">
+    <h2>All CCTV Accessories</h2>
+    <div class="grid">
+        <%
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM cctvaccess WHERE category='CCTV Accessory'");
+
+                while (rs.next()) {
+        %>
+        <div class="card">
+            <img src="<%= rs.getString("image_url") %>" alt="CCTV Accessory">
+            <h3><%= rs.getString("name") %></h3>
+            <p><%= rs.getString("brand") %> | <%= rs.getString("item_code") %></p>
+            <p class="price">Rs. <%= rs.getDouble("price") %></p>
+            <p class="cash-price">Cash: Rs. <%= rs.getDouble("cash_price") %></p>
+            <p>Status: <%= rs.getString("stock_status") %></p>
+            <div class="buttons">
+                <button class="add-cart">Add to Cart</button>
+                <button class="view-more">View More</button>
+                <button class="buy-now">Buy Now</button>
+            </div>
+        </div>
+        <%
+                }
+                conn.close();
+            } catch (Exception e) {
+                out.print("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+            }
+        %>
+    </div>
+</div>
+
+</body>
+</html>

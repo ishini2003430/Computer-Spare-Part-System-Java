@@ -1,0 +1,27 @@
+package ComputerPackage;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+
+@WebServlet("/UpdateNotificationsServlet")
+public class UpdateNotificationsServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Read parameters from form (checkboxes return "on" if checked, null if unchecked)
+        boolean emailNotifications = request.getParameter("emailNotifications") != null;
+        boolean smsNotifications = request.getParameter("smsNotifications") != null;
+        boolean pushNotifications = request.getParameter("pushNotifications") != null;
+
+        // For example, save these preferences in session
+        HttpSession session = request.getSession();
+        session.setAttribute("emailNotifications", emailNotifications);
+        session.setAttribute("smsNotifications", smsNotifications);
+        session.setAttribute("pushNotifications", pushNotifications);
+
+        // Optionally: You can save these preferences to DB here
+
+        // Redirect back to settings page (or show a success message)
+        response.sendRedirect("Settings.jsp");
+    }
+}

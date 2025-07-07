@@ -1,0 +1,47 @@
+package ComputerPackage;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.HashMap;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+@WebServlet("/RemoveFromCartServlet")
+public class RemoveFromCartServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idStr = request.getParameter("id");
+        if (idStr == null || idStr.isEmpty()) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+        
+        int productId;
+        try {
+            productId = Integer.parseInt(idStr);
+        } catch (NumberFormatException e) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+        
+        HttpSession session = request.getSession();
+        List<HashMap<String, Object>> cart = (List<HashMap<String, Object>>) session.getAttribute("cart");
+        
+        if (cart != null) {
+            cart.removeIf(item -> {
+                int itemId = (int) item.get("id");
+                return itemId == productId;
+            });
+            // If cart empty after removal, you can set to null or keep empty list
+            if (cart.isEmpty()) {
+                session.removeAttribute("cart");
+            } else {
+                session.setAttribute("cart", cart);
+            }
+        }
+        
+        response.sendRedirect("ViewCart.jsp");
+    }
+}

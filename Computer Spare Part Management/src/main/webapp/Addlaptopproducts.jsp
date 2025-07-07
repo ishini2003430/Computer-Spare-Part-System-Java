@@ -1,0 +1,102 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Laptop Accessories</title>
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #f4f4f4;
+    }
+
+    form {
+      background: #fff;
+      padding: 20px;
+      margin: 50px auto;
+      width: 500px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #111827;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1e293b;
+    }
+
+    a.back-btn {
+      display: inline-block;
+      margin-bottom: 15px;
+      padding: 8px 14px;
+      background-color: #6b7280;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    a.back-btn:hover {
+      background-color: #4b5563;
+    }
+  </style>
+</head>
+<body>
+  <a href="Categories.jsp" class="back-btn">Back</a>
+  <form action="AddLaptopAccessServlet" method="post">
+    <h2>Add New Laptop Accessories</h2>
+
+    <label for="name">Name</label>
+    <input type="text" name="name" id="name" placeholder="Product Name" required>
+
+    <label for="category">Category</label>
+    <input type="text" name="category" id="category" placeholder="Category (e.g., Laptop)" required>
+
+    <label for="item_code">Item Code</label>
+    <input type="text" name="item_code" id="item_code" placeholder="Item Code" required>
+
+    <label for="price">Price (Rs.)</label>
+    <input type="number" name="price" id="price" placeholder="Price" step="0.01" required>
+
+    <label for="cash_price">Cash Price (Rs.)</label>
+    <input type="number" name="cash_price" id="cash_price" placeholder="Cash Price" step="0.01" required>
+
+    <label for="stock_status">Stock Status</label>
+    <select name="stock_status" id="stock_status" required>
+      <option value="In Stock">In Stock</option>
+      <option value="Low Stock">Low Stock</option>
+      <option value="Out of Stock">Out of Stock</option>
+    </select>
+
+    <label for="image_url">Image URL</label>
+    <input type="text" name="image_url" id="image_url" placeholder="Image URL" required>
+
+    <label for="description">Description</label>
+    <textarea name="description" id="description" rows="4" placeholder="Product Description"></textarea>
+
+    <button type="submit">Add Laptop Product</button>
+  </form>
+</body>
+</html>

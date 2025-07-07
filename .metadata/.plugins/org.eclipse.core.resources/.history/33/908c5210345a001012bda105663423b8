@@ -1,0 +1,129 @@
+<%@ page import="java.sql.*" %>
+<%
+    String orderIdStr = request.getParameter("orderId");
+    if (orderIdStr == null || orderIdStr.trim().isEmpty()) {
+%>
+    <p style="color:red; font-weight:bold;">Order ID is missing. Please select a valid order.</p>
+<%
+    } else {
+        int orderId = 0;
+        try {
+            orderId = Integer.parseInt(orderIdStr);
+        } catch (NumberFormatException e) {
+%>
+    <p style="color:red; font-weight:bold;">Invalid Order ID.</p>
+<%
+        }
+
+        if (orderId != 0) {
+            Connection conn = null;
+            PreparedStatement psOrder = null;
+            PreparedStatement psItems = null;
+            ResultSet rsOrder = null;
+            ResultSet rsItems = null;
+
+            String name = null, email = null, phone = null, address = null;
+            double totalAmount = 0;
+            boolean orderFound = false;
+
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+                psOrder = conn.prepareStatement("SELECT * FROM orders WHERE id = ?");
+                psOrder.setInt(1, orderId);
+                rsOrder = psOrder.executeQuery();
+
+                if (rsOrder.next()) {
+                    orderFound = true;
+                    name = rsOrder.getString("name");
+                    email = rsOrder.getString("email");
+                    phone = rsOrder.getString("phone");
+                    address = rsOrder.getString("address");
+                    totalAmount = rsOrder.getDouble("total_amount");
+                }
+            } catch (Exception e) {
+                out.print("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+            } finally {
+                try { if (rsOrder != null) rsOrder.close(); } catch (Exception e) {}
+                try { if (psOrder != null) psOrder.close(); } catch (Exception e) {}
+                try { if (conn != null) conn.close(); } catch (Exception e) {}
+            }
+
+            if (orderFound) {
+                // Display order info and fetch order items in separate query
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Details - Order #<%= orderId %></title>
+    <style>
+        /* Your CSS here */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Order Details - Order #<%= orderId %></h2>
+        <div class="order-info">
+            <p><strong>Customer Name:</strong> <%= name %></p>
+            <p><strong>Email:</strong> <%= email %></p>
+            <p><strong>Phone:</strong> <%= phone %></p>
+            <p><strong>Address:</strong> <%= address %></p>
+        </div>
+        <table border="1" width="100%" cellpadding="10" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Price (Rs.)</th>
+                    <th>Quantity</th>
+                    <th>Subtotal (Rs.)</th>
+                </tr>
+            </thead>
+            <tbody>
+<%
+                // Now get order items - separate DB connection for simplicity
+                try {
+                    Class.forName("com.mysql.jdbc.Driver");
+                    conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+                    psItems = conn.prepareStatement("SELECT * FROM order_items WHERE order_id = ?");
+                    psItems.setInt(1, orderId);
+                    rsItems = psItems.executeQuery();
+
+                    while (rsItems.next()) {
+                        String productName = rsItems.getString("product_name");
+                        double price = rsItems.getDouble("price");
+                        int quantity = rsItems.getInt("quantity");
+                        double subtotal = price * quantity;
+%>
+                <tr>
+                    <td><%= productName %></td>
+                    <td><%= String.format("%.2f", price) %></td>
+                    <td><%= quantity %></td>
+                    <td><%= String.format("%.2f", subtotal) %></td>
+                </tr>
+<%
+                    }
+                } catch (Exception e) {
+                    out.print("<tr><td colspan='4' style='color:red;'>Error loading order items: " + e.getMessage() + "</td></tr>");
+                } finally {
+                    try { if (rsItems != null) rsItems.close(); } catch (Exception e) {}
+                    try { if (psItems != null) psItems.close(); } catch (Exception e) {}
+                    try { if (conn != null) conn.close(); } catch (Exception e) {}
+                }
+%>
+            </tbody>
+        </table>
+        <p><strong>Total Amount:</strong> Rs. <%= String.format("%.2f", totalAmount) %></p>
+        <a href="OrdersList.jsp">Back to Orders List</a>
+    </div>
+</body>
+</html>
+<%
+            } else {
+%>
+    <p style="color:red; font-weight:bold;">Order not found.</p>
+<%
+            }
+        }
+    }
+%>

@@ -1,0 +1,35 @@
+package ComputerPackage;
+
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.sql.*;
+
+@WebServlet("/DeletePrinterServlet")
+public class DeletePrinterServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+
+        try {
+            // Load JDBC driver and connect to the database
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+            // Prepare and execute delete statement
+            String sql = "DELETE FROM printers WHERE id = ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, id);
+            ps.executeUpdate();
+
+            con.close();
+
+            // Redirect back to printer list
+            response.sendRedirect("viewprinters.jsp");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().println("Error deleting printer: " + e.getMessage());
+        }
+    }
+}

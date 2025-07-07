@@ -1,0 +1,57 @@
+package ComputerPackage;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+@WebServlet("/UpdateCartServlet")
+public class UpdateCartServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idStr = request.getParameter("id");
+        String quantityStr = request.getParameter("quantity");
+        
+        if (idStr == null || quantityStr == null) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+        
+        int id, quantity;
+        try {
+            id = Integer.parseInt(idStr);
+            quantity = Integer.parseInt(quantityStr);
+            if(quantity < 1) quantity = 1;
+        } catch (NumberFormatException e) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+        
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+        
+        List<HashMap<String, Object>> cart = (List<HashMap<String, Object>>) session.getAttribute("cart");
+        if (cart != null) {
+            for (HashMap<String, Object> item : cart) {
+                try {
+                    int itemId = Integer.parseInt(item.get("id").toString());
+                    if (itemId == id) {
+                        item.put("quantity", quantity);
+                        break;
+                    }
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
+            session.setAttribute("cart", cart);
+        }
+        
+        response.sendRedirect("ViewCart.jsp");
+    }
+}

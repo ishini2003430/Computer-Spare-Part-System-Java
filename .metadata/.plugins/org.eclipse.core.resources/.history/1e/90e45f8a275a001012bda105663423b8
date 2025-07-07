@@ -1,0 +1,112 @@
+<%@ page import="java.util.*, ComputerPackage.CartItem" %>
+<%@ page session="true" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout - TechParts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9fafb;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1f2937;
+        }
+
+        form {
+            background: white;
+            padding: 30px;
+            max-width: 600px;
+            margin: 30px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #374151;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .submit-btn {
+            margin-top: 25px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .total {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #111827;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Checkout</h2>
+
+<%
+    List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+    double total = 0;
+    if (cart != null && !cart.isEmpty()) {
+        for (CartItem item : cart) {
+            total += item.getPrice() * item.getQuantity();
+        }
+%>
+
+<form action="PlaceOrderServlet" method="post">
+    <label>Full Name:</label>
+    <input type="text" name="name" required>
+
+    <label>Email:</label>
+    <input type="email" name="email" required>
+
+    <label>Phone Number:</label>
+    <input type="tel" name="phone" required pattern="[0-9]{10}">
+
+    <label>Shipping Address:</label>
+    <textarea name="address" rows="3" required></textarea>
+
+    <input type="hidden" name="total" value="<%= total %>">
+
+    <div class="total">Total Amount: Rs. <%= String.format("%.2f", total) %></div>
+
+    <button class="submit-btn" type="submit">Place Order</button>
+</form>
+
+<% } else { %>
+    <p style="text-align:center; color:#6b7280; font-size:18px; margin-top: 50px;">
+        Your cart is empty. <a href="Laptops.jsp">Shop Now</a>
+    </p>
+<% } %>
+
+</body>
+</html>

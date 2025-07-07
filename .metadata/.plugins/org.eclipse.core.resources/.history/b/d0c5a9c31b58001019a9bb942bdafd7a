@@ -1,0 +1,176 @@
+<%@ page import="java.sql.*" %>
+<%@ page import="java.math.BigDecimal" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+<%
+    String id = request.getParameter("id");
+    if (id == null || id.trim().isEmpty()) {
+        response.sendRedirect("ViewAccessories.jsp"); // Redirect if no id provided
+        return;
+    }
+
+    // Initialize variables to hold product info
+    String name = "";
+    String item_code = "";
+    String category = "CCTV Accessory";
+    BigDecimal price = BigDecimal.ZERO;
+    BigDecimal cash_price = BigDecimal.ZERO;
+    String stock_status = "";
+    String image_url = "";
+    String description = "";
+    String brand = "";
+
+    Connection conn = null;
+    PreparedStatement pst = null;
+    ResultSet rs = null;
+
+    try {
+        Class.forName("com.mysql.jdbc.Driver"); // or com.mysql.cj.jdbc.Driver for MySQL 8+
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+        String sql = "SELECT * FROM products WHERE id = ?";
+        pst = conn.prepareStatement(sql);
+        pst.setInt(1, Integer.parseInt(id));
+        rs = pst.executeQuery();
+
+        if (rs.next()) {
+            name = rs.getString("name");
+            item_code = rs.getString("item_code");
+            category = rs.getString("category");
+            price = rs.getBigDecimal("price");
+            cash_price = rs.getBigDecimal("cash_price");
+            stock_status = rs.getString("stock_status");
+            image_url = rs.getString("image_url");
+            description = rs.getString("description");
+            brand = rs.getString("brand");
+        } else {
+            // No product found with this id
+            response.sendRedirect("ViewAccessories.jsp");
+            return;
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (rs != null) try { rs.close(); } catch (Exception e) {}
+        if (pst != null) try { pst.close(); } catch (Exception e) {}
+        if (conn != null) try { conn.close(); } catch (Exception e) {}
+    }
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Edit CCTV Accessory - TechParts</title>
+    <style>
+        /* Use the same CSS from your add page or adjust accordingly */
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #374151;
+        }
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            background: #f9fafb;
+        }
+        textarea {
+            resize: vertical;
+        }
+        input[type="submit"] {
+            background-color: #2563eb;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #1e40af;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #374151;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Edit CCTV Accessory</h2>
+    <form action="UpdateCctvAccessoryServlet" method="post">
+        <input type="hidden" name="id" value="<%= id %>">
+
+        <label for="name">Product Name</label>
+        <input type="text" name="name" value="<%= name %>" required>
+
+        <label for="item_code">Item Code</label>
+        <input type="text" name="item_code" value="<%= item_code %>" required>
+
+        <label for="category">Category</label>
+        <input type="text" name="category" value="<%= category %>" readonly>
+
+        <label for="price">Price (Rs.)</label>
+        <input type="number" step="0.01" name="price" value="<%= price %>" required>
+
+        <label for="cash_price">Cash Price (Rs.)</label>
+        <input type="number" step="0.01" name="cash_price" value="<%= cash_price %>" required>
+
+        <label for="stock_status">Stock Status</label>
+        <select name="stock_status" required>
+            <option value="">-- Select Status --</option>
+            <option value="In Stock" <%= "In Stock".equals(stock_status) ? "selected" : "" %>>In Stock</option>
+            <option value="Low Stock" <%= "Low Stock".equals(stock_status) ? "selected" : "" %>>Low Stock</option>
+            <option value="Out of Stock" <%= "Out of Stock".equals(stock_status) ? "selected" : "" %>>Out of Stock</option>
+        </select>
+
+        <label for="image_url">Image URL</label>
+        <input type="text" name="image_url" value="<%= image_url %>" required>
+
+        <label for="description">Description</label>
+        <textarea name="description" rows="4"><%= description != null ? description : "" %></textarea>
+
+        <label for="brand">Brand</label>
+        <input type="text" name="brand" value="<%= brand %>">
+
+        <input type="submit" value="Update Accessory">
+    </form>
+    <a href="ViewAccessories.jsp" class="back-link">← Back to Accessories List</a>
+</div>
+</body>
+</html>

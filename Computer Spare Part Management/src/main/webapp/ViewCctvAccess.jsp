@@ -1,0 +1,171 @@
+<%@ page import="java.sql.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>View CCTV Accessories - TechParts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 30px;
+        }
+
+        .add-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 18px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .add-button:hover {
+            background-color: #1e40af;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background-color: #111827;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .actions a {
+            padding: 6px 12px;
+            margin-right: 8px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            color: white;
+        }
+
+        .edit-btn {
+            background-color: #10b981;
+        }
+
+        .delete-btn {
+            background-color: #ef4444;
+        }
+
+        .image-thumb {
+            width: 60px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .desc-cell {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+
+<div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+    <a href="Categories.jsp" class="add-button" style="background-color: #6b7280;"> Back to Categories</a>
+    <a href="AddCCTVAcces.jsp" class="add-button"> Add CCTV Accessory</a>
+</div>
+
+<h2>CCTV Accessories List</h2>
+
+<%
+    try {
+        Class.forName("com.mysql.jdbc.Driver");
+        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT * FROM cctvaccess WHERE category='CCTV Accessory'");
+
+        if (rs.next()) {
+%>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Image</th>
+        <th>Item Code</th>
+        <th>Name</th>
+        <th>Brand</th>
+        <th>Price</th>
+        <th>Cash Price</th>
+        <th>Status</th>
+        <th>Description</th>
+        <th>Actions</th>
+    </tr>
+    <%
+        do {
+    %>
+    <tr>
+        <td><%= rs.getInt("id") %></td>
+        <td><img src="<%= rs.getString("image_url") %>" alt="Image" class="image-thumb"></td>
+        <td><%= rs.getString("item_code") %></td>
+        <td><%= rs.getString("name") %></td>
+        <td><%= rs.getString("brand") %></td>
+        <td>Rs. <%= rs.getDouble("price") %></td>
+        <td>Rs. <%= rs.getDouble("cash_price") %></td>
+        <td><%= rs.getString("stock_status") %></td>
+        <td class="desc-cell"><%= rs.getString("description") %></td>
+        <td class="actions">
+            <a href="EditCctvAccessory.jsp?id=<%= rs.getInt("id") %>" class="edit-btn">Edit</a>
+            <a href="DeleteCctvAccessServlet?id=<%= rs.getInt("id") %>" class="delete-btn" onclick="return confirm('Are you sure you want to delete this accessory?');">Delete</a>
+        </td>
+    </tr>
+    <%
+        } while (rs.next());
+    %>
+</table>
+<% 
+    } else {
+        out.println("<p style='text-align:center;'>No CCTV accessories found.</p>");
+    }
+
+    rs.close();
+    stmt.close();
+    conn.close();
+} catch (Exception e) {
+    out.println("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+}
+%>
+
+</body>
+</html>

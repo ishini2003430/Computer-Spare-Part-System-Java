@@ -1,0 +1,153 @@
+<%@ page import="java.sql.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Laptops</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        a.back-btn, a.add-btn {
+            display: inline-block;
+            padding: 8px 14px;
+            background-color: #6b7280;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        a.add-btn {
+            background-color: #2563eb;
+            margin-left: 10px;
+        }
+
+        a.back-btn:hover {
+            background-color: #4b5563;
+        }
+
+        a.add-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #111827;
+            color: white;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-edit {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: #059669;
+        }
+
+        .btn-delete {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #dc2626;
+        }
+
+        img.product-image {
+            width: 100px;
+            height: auto;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="Categories.jsp" class="back-btn">Back</a>
+    <a href="Addlaptop.jsp" class="add-btn">+ Add New Laptop</a>
+
+    <h2>All Laptops</h2>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>CPU</th>
+            <th>GPU</th>
+            <th>RAM</th>
+            <th>Storage</th>
+            <th>Display</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+        <%
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+                Statement st = conn.createStatement();
+                ResultSet rs = st.executeQuery("SELECT * FROM laptops");
+
+                while (rs.next()) {
+        %>
+        <tr>
+            <td><%= rs.getInt("id") %></td>
+            <td><%= rs.getString("brand") %></td>
+            <td><%= rs.getString("model") %></td>
+            <td><%= rs.getString("cpu") %></td>
+            <td><%= rs.getString("gpu") %></td>
+            <td><%= rs.getString("ram") %></td>
+            <td><%= rs.getString("storage") %></td>
+            <td><%= rs.getString("display") %></td>
+            <td>Rs. <%= rs.getDouble("price") %></td>
+            <td><%= rs.getString("stock_status") %></td>
+            <td>
+                <img src="<%= rs.getString("image_url") %>" alt="Laptop Image" class="product-image" />
+            </td>
+            <td>
+                <a href="EditLaptop.jsp?id=<%= rs.getInt("id") %>" class="btn btn-edit">Edit</a>
+                <a href="DeleteLaptopServlet?id=<%= rs.getInt("id") %>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this laptop?')">Delete</a>
+            </td>
+        </tr>
+        <%
+                }
+                conn.close();
+            } catch (Exception e) {
+                out.print("Error: " + e.getMessage());
+            }
+        %>
+    </table>
+</body>
+</html>

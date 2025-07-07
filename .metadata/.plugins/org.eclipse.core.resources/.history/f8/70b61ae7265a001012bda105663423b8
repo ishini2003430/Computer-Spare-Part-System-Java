@@ -1,0 +1,157 @@
+<%@ page import="java.util.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout - TechParts</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 40px; }
+        h2 { text-align: center; margin-bottom: 30px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #111827;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+        img.cart-image {
+            width: 80px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+        .total-row td {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #16a34a;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #15803d;
+        }
+        .empty-msg {
+            text-align: center;
+            font-size: 18px;
+            color: #555;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Checkout</h2>
+
+<%
+    List<HashMap<String, Object>> cart = (List<HashMap<String, Object>>) session.getAttribute("cart");
+    if (cart == null || cart.isEmpty()) {
+%>
+    <p class="empty-msg">Your cart is empty. <a href="Laptops.jsp">Go back to products.</a></p>
+<%
+    } else {
+        double total = 0;
+%>
+
+<table>
+    <tr>
+        <th>Image</th>
+        <th>Product Name</th>
+        <th>Price (LKR)</th>
+        <th>Quantity</th>
+        <th>Subtotal (LKR)</th>
+    </tr>
+
+    <% for (HashMap<String, Object> item : cart) {
+            double price = 0;
+            int quantity = 0;
+            try {
+                price = (Double) item.get("price");
+            } catch (Exception e) {
+                price = ((Number) item.get("price")).doubleValue();
+            }
+            try {
+                quantity = (Integer) item.get("quantity");
+            } catch (Exception e) {
+                quantity = ((Number) item.get("quantity")).intValue();
+            }
+            double subtotal = price * quantity;
+            total += subtotal;
+    %>
+    <tr>
+        <td><img src="<%= item.get("image") %>" alt="Product Image" class="cart-image" /></td>
+        <td><%= item.get("name") %></td>
+        <td><%= String.format("%.2f", price) %></td>
+        <td><%= quantity %></td>
+        <td><%= String.format("%.2f", subtotal) %></td>
+    </tr>
+    <% } %>
+
+    <tr class="total-row">
+        <td colspan="4" style="text-align:right;">Total:</td>
+        <td>Rs. <%= String.format("%.2f", total) %></td>
+    </tr>
+</table>
+
+<form action="ProcessOrderServlet" method="post">
+    <label for="customerName">Full Name:</label>
+    <input type="text" id="customerName" name="customerName" required>
+
+    <label for="email">Email Address:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="address">Shipping Address:</label>
+    <textarea id="address" name="address" rows="4" required></textarea>
+
+    <button type="submit">Place Order</button>
+</form>
+
+<%
+    }
+%>
+
+</body>
+</html>

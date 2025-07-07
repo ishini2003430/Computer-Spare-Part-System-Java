@@ -1,0 +1,86 @@
+package ComputerPackage;
+
+
+import java.io.IOException;
+import java.util.*;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+@WebServlet("/UpdateCartServlet")
+public class UpdateCartServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idStr = request.getParameter("id");
+        String quantityStr = request.getParameter("quantity");
+
+        if (idStr == null || quantityStr == null) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+
+        int id;
+        int newQuantity;
+
+        try {
+            id = Integer.parseInt(idStr);
+            newQuantity = Integer.parseInt(quantityStr);
+        } catch (NumberFormatException e) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.sendRedirect("ViewCart.jsp");
+            return;
+        }
+
+        // Retrieve cart from session
+        List<HashMap<String, Object>> cart = (List<HashMap<String, Object>>) session.getAttribute("cart");
+
+        if (cart != null) {
+            Iterator<HashMap<String, Object>> iterator = cart.iterator();
+            while (iterator.hasNext()) {
+                HashMap<String, Object> item = iterator.next();
+                Object itemIdObj = item.get("id");
+                int itemId = -1;
+                if (itemIdObj instanceof Integer) {
+                    itemId = (Integer) itemIdObj;
+                } else if (itemIdObj instanceof Long) {
+                    itemId = ((Long) itemIdObj).intValue();
+                } else if (itemIdObj instanceof String) {
+                    try {
+                        itemId = Integer.parseInt((String) itemIdObj);
+                    } catch (NumberFormatException e) {
+                        // skip this item if id invalid
+                        continue;
+                    }
+                }
+
+                if (itemId == id) {
+                    if (newQuantity > 0) {
+                        item.put("quantity", newQuantity);
+                    } else {
+                        // Remove item if quantity <= 0
+                        iterator.remove();
+                    }
+                    break;
+                }
+            }
+
+            session.setAttribute("cart", cart);
+        }
+
+        response.sendRedirect("ViewCart.jsp");
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.sendRedirect("ViewCart.jsp");
+    }
+}

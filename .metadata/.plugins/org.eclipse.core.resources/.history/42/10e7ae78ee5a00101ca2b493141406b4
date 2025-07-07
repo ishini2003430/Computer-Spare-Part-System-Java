@@ -1,0 +1,501 @@
+<%@ page import="java.sql.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Reports - TechParts</title>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- html2canvas for capturing DOM as image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* Reset */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background: #f3f4f6;
+            display: flex;
+            min-height: 100vh;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 230px;
+            background: #1e293b;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1rem;
+            justify-content: space-between;
+        }
+        .sidebar h2 {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            user-select: none;
+        }
+        .nav-link {
+            color: #cbd5e1;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            user-select: none;
+        }
+        .nav-link:hover,
+        .nav-link.active {
+            background: #2563eb;
+            color: white;
+        }
+        .logout-btn {
+            background: #ef4444;
+            border: none;
+            padding: 0.75rem;
+            font-weight: 700;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            user-select: none;
+        }
+        /* Main Content */
+        .main {
+            flex-grow: 1;
+            padding: 2.5rem 3rem;
+            overflow-y: auto;
+        }
+        h1 {
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            font-size: 2.5rem;
+            user-select: none;
+        }
+        /* Metrics Cards */
+        .metrics {
+            display: flex;
+            gap: 1.75rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .metric-card {
+            background: white;
+            padding: 1.75rem 2rem;
+            flex: 1;
+            min-width: 180px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgb(0 0 0 / 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: box-shadow 0.3s ease;
+            user-select: none;
+        }
+        .metric-card:hover {
+            box-shadow: 0 12px 30px rgb(37 99 235 / 0.3);
+        }
+        .metric-card h2 {
+            font-size: 3rem;
+            margin: 0;
+            color: #2563eb;
+        }
+        .metric-card p {
+            margin-top: 0.5rem;
+            font-weight: 600;
+            color: #475569;
+        }
+        /* Section Titles */
+        h2.section-title {
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+            user-select: none;
+        }
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgb(0 0 0 / 0.05);
+            margin-bottom: 2rem;
+            user-select: none;
+        }
+        th, td {
+            padding: 14px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            font-weight: 700;
+            color: #64748b;
+        }
+        tbody tr:hover {
+            background: #e0e7ff;
+        }
+        /* Chart container */
+        .chart-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgb(0 0 0 / 0.05);
+            margin-bottom: 3rem;
+            user-select: none;
+        }
+        /* Export Button */
+        .btn-export {
+            background: #2563eb;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.3s ease;
+            margin-bottom: 1.5rem;
+            float: right;
+        }
+        .btn-export:hover {
+            background: #1e40af;
+        }
+        /* Responsive */
+        @media (max-width: 900px) {
+            .metrics {
+                flex-direction: column;
+            }
+            .metric-card {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div>
+        <h2>TechParts</h2>
+        <a href="ManagerDashboard.jsp" class="nav-link">Dashboard</a>
+        <a href="Categories.jsp" class="nav-link">Categories</a>
+        <a href="SupplierDetails.jsp" class="nav-link">Suppliers</a>
+        <a href="ViewOrderDetails.jsp" class="nav-link">Orders</a>
+        <a href="SalesDetails.jsp" class="nav-link">Sales</a>
+        <a href="Reports.jsp" class="nav-link active">Reports</a>
+        <a href="#" class="nav-link">Settings</a>
+    </div>
+    <button class="logout-btn" onclick="window.location.href='Login.jsp'">Logout</button>
+</div>
+
+<!-- Main Content -->
+<div class="main" id="report-content">
+
+    <h1>Reports Dashboard</h1>
+
+    <button class="btn-export" id="exportPdfBtn">Export Report as PDF</button>
+
+<%
+    int totalSuppliers = 0;
+    int totalParts = 0;
+    int totalOrders = 0;
+    double totalSalesAmount = 0.0;
+
+    // Data for charts
+    java.util.Map<String, Double> salesByMonth = new java.util.LinkedHashMap<>();
+    java.util.Map<String, Integer> ordersByMonth = new java.util.LinkedHashMap<>();
+
+    Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    try {
+        Class.forName("com.mysql.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+        // Get total counts and sums
+        ps = conn.prepareStatement("SELECT COUNT(*) FROM suppliers");
+        rs = ps.executeQuery();
+        if (rs.next()) totalSuppliers = rs.getInt(1);
+        rs.close(); ps.close();
+
+        ps = conn.prepareStatement("SELECT COUNT(*) FROM parts");
+        rs = ps.executeQuery();
+        if (rs.next()) totalParts = rs.getInt(1);
+        rs.close(); ps.close();
+
+        ps = conn.prepareStatement("SELECT COUNT(*) FROM orders");
+        rs = ps.executeQuery();
+        if (rs.next()) totalOrders = rs.getInt(1);
+        rs.close(); ps.close();
+
+        ps = conn.prepareStatement("SELECT IFNULL(SUM(total_amount),0) FROM orders");
+        rs = ps.executeQuery();
+        if (rs.next()) totalSalesAmount = rs.getDouble(1);
+        rs.close(); ps.close();
+
+        // Setup last 6 months labels
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.set(java.util.Calendar.DAY_OF_MONTH, 1);
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM yyyy");
+
+        for (int i=5; i>=0; i--) {
+            cal.add(java.util.Calendar.MONTH, -i);
+            salesByMonth.put(sdf.format(cal.getTime()), 0.0);
+            ordersByMonth.put(sdf.format(cal.getTime()), 0);
+            cal.add(java.util.Calendar.MONTH, i);
+        }
+
+        // Fill sales per month
+        ps = conn.prepareStatement(
+            "SELECT DATE_FORMAT(created_at, '%Y-%m') as ym, IFNULL(SUM(total_amount),0) AS total_sales, COUNT(*) AS order_count " +
+            "FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) " +
+            "GROUP BY ym ORDER BY ym ASC");
+        rs = ps.executeQuery();
+
+        java.text.SimpleDateFormat dbSdf = new java.text.SimpleDateFormat("yyyy-MM");
+        while(rs.next()) {
+            String ym = rs.getString("ym");
+            double sales = rs.getDouble("total_sales");
+            int count = rs.getInt("order_count");
+
+            // Convert ym "yyyy-MM" to "MMM yyyy"
+            java.util.Date date = dbSdf.parse(ym);
+            String monthLabel = sdf.format(date);
+
+            salesByMonth.put(monthLabel, sales);
+            ordersByMonth.put(monthLabel, count);
+        }
+        rs.close(); ps.close();
+
+%>
+
+    <!-- Metrics -->
+    <div class="metrics">
+        <div class="metric-card">
+            <h2><%= totalSuppliers %></h2>
+            <p>Total Suppliers</p>
+        </div>
+        <div class="metric-card">
+            <h2><%= totalParts %></h2>
+            <p>Total Parts</p>
+        </div>
+        <div class="metric-card">
+            <h2><%= totalOrders %></h2>
+            <p>Total Orders</p>
+        </div>
+        <div class="metric-card">
+            <h2>$<%= String.format("%.2f", totalSalesAmount) %></h2>
+            <p>Total Sales Amount</p>
+        </div>
+    </div>
+
+    <!-- Recent Suppliers -->
+    <h2 class="section-title">Recent Suppliers</h2>
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Company</th></tr>
+        </thead>
+        <tbody>
+        <%
+            ps = conn.prepareStatement("SELECT id, name, email, phone, company FROM suppliers ORDER BY id DESC LIMIT 5");
+            rs = ps.executeQuery();
+            while(rs.next()) {
+        %>
+            <tr>
+                <td><%= rs.getInt("id") %></td>
+                <td><%= rs.getString("name") %></td>
+                <td><%= rs.getString("email") %></td>
+                <td><%= rs.getString("phone") %></td>
+                <td><%= rs.getString("company") %></td>
+            </tr>
+        <%
+            }
+            rs.close(); ps.close();
+        %>
+        </tbody>
+    </table>
+
+    <!-- Recent Orders -->
+    <h2 class="section-title">Recent Orders</h2>
+    <table>
+        <thead>
+            <tr><th>Order ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Total Amount</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+        <%
+            ps = conn.prepareStatement("SELECT id, name, email, phone, total_amount, created_at FROM orders ORDER BY created_at DESC LIMIT 5");
+            rs = ps.executeQuery();
+            while(rs.next()) {
+        %>
+            <tr>
+                <td><%= rs.getInt("id") %></td>
+                <td><%= rs.getString("name") %></td>
+                <td><%= rs.getString("email") %></td>
+                <td><%= rs.getString("phone") %></td>
+                <td>$<%= String.format("%.2f", rs.getDouble("total_amount")) %></td>
+                <td><%= rs.getTimestamp("created_at") %></td>
+            </tr>
+        <%
+            }
+            rs.close(); ps.close();
+            conn.close();
+        } catch(Exception e) {
+            out.println("<p style='color:red; font-weight:bold;'>Error: " + e.getMessage() + "</p>");
+        }
+        %>
+        </tbody>
+    </table>
+
+    <!-- Charts Section -->
+    <h2 class="section-title">Sales and Orders - Last 6 Months</h2>
+    <div class="chart-section">
+        <canvas id="salesOrdersChart" height="250"></canvas>
+    </div>
+</div>
+
+<script>
+    // Prepare chart data from JSP
+    const months = [
+        <% 
+            boolean first = true;
+            for (String key : salesByMonth.keySet()) {
+                if (!first) out.print(", ");
+                out.print("'" + key + "'");
+                first = false;
+            }
+        %>
+    ];
+    const salesData = [
+        <% 
+            first = true;
+            for (Double val : salesByMonth.values()) {
+                if (!first) out.print(", ");
+                out.print(val);
+                first = false;
+            }
+        %>
+    ];
+    const ordersData = [
+        <% 
+            first = true;
+            for (Integer val : ordersByMonth.values()) {
+                if (!first) out.print(", ");
+                out.print(val);
+                first = false;
+            }
+        %>
+    ];
+
+    const ctx = document.getElementById('salesOrdersChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Sales ($)',
+                    data: salesData,
+                    backgroundColor: 'rgba(37, 99, 235, 0.7)',
+                    borderRadius: 5,
+                    yAxisID: 'y1',
+                },
+                {
+                    label: 'Orders',
+                    data: ordersData,
+                    type: 'line',
+                    borderColor: '#ef4444',
+                    backgroundColor: '#ef4444',
+                    yAxisID: 'y2',
+                    tension: 0.4,
+                    fill: false,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    borderWidth: 3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            stacked: false,
+            scales: {
+                y1: {
+                    type: 'linear',
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Sales ($)'
+                    },
+                    beginAtZero: true
+                },
+                y2: {
+                    type: 'linear',
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Orders'
+                    },
+                    beginAtZero: true,
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: '600'
+                        }
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            }
+        }
+    });
+
+    // PDF Export
+    const exportBtn = document.getElementById('exportPdfBtn');
+    exportBtn.addEventListener('click', () => {
+        // Use html2canvas to capture report-content
+        const { jsPDF } = window.jspdf;
+        const reportContent = document.getElementById('report-content');
+
+        html2canvas(reportContent, { scale: 2 }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'pt', 'a4');
+
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save('TechParts_Report.pdf');
+        });
+    });
+</script>
+
+</body>
+</html>

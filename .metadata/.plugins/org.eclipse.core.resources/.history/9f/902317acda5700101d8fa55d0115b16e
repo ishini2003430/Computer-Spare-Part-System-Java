@@ -1,0 +1,66 @@
+package ComputerPackage;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+
+
+
+@WebServlet("/UpdateLaptopAccessServlet")
+public class UpdateLaptopAccessServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    private String jdbcURL = "jdbc:mysql://localhost:3306/your_database_name";
+    private String jdbcUsername = "your_db_username";
+    private String jdbcPassword = "your_db_password";
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        int id = Integer.parseInt(request.getParameter("id"));
+        String name = request.getParameter("name");
+        String category = request.getParameter("category");
+        String item_code = request.getParameter("item_code");
+        double price = Double.parseDouble(request.getParameter("price"));
+        double cash_price = Double.parseDouble(request.getParameter("cash_price"));
+        String stock_status = request.getParameter("stock_status");
+        String image_url = request.getParameter("image_url");
+        String description = request.getParameter("description");
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword);
+
+            String sql = "UPDATE products SET name=?, category=?, item_code=?, price=?, cash_price=?, stock_status=?, image_url=?, description=? WHERE id=?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
+            stmt.setString(1, name);
+            stmt.setString(2, category);
+            stmt.setString(3, item_code);
+            stmt.setDouble(4, price);
+            stmt.setDouble(5, cash_price);
+            stmt.setString(6, stock_status);
+            stmt.setString(7, image_url);
+            stmt.setString(8, description);
+            stmt.setInt(9, id);
+
+            stmt.executeUpdate();
+            conn.close();
+
+            response.sendRedirect("viewproducts.jsp");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().println("Update error: " + e.getMessage());
+        }
+    }
+}

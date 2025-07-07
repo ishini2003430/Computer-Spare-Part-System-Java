@@ -1,0 +1,120 @@
+<%@ page import="java.sql.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Reports - TechParts</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+<%
+    int totalSuppliers = 0;
+    int totalParts = 0;
+    int totalOrders = 0;
+    double totalSalesAmount = 0.0;
+
+    java.util.Map<String, Double> salesByCustomer = new java.util.LinkedHashMap<>();
+    java.util.Map<String, Integer> ordersByCustomer = new java.util.LinkedHashMap<>();
+    java.util.Map<String, Integer> partsByCategory = new java.util.LinkedHashMap<>();
+
+    Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    try {
+        Class.forName("com.mysql.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+        ps = conn.prepareStatement("SELECT COUNT(*) FROM suppliers");
+        rs = ps.executeQuery();
+        if (rs.next()) totalSuppliers = rs.getInt(1);
+        rs.close(); ps.close();
+
+        ps = conn.prepareStatement("SELECT COUNT(*) FROM parts");
+        rs = ps.executeQuery();
+        if (rs.next()) totalParts = rs.getInt(1);
+        rs.close(); ps.close();
+
+        ps = conn.prepareStatement("SELECT COUNT(*) FROM orders");
+        rs = ps.executeQuery();
+        if (rs.next()) totalOrders = rs.getInt(1);
+        rs.close(); ps.close();
+
+        ps = conn.prepareStatement("SELECT IFNULL(SUM(total_amount),0) FROM orders");
+        rs = ps.executeQuery();
+        if (rs.next()) totalSalesAmount = rs.getDouble(1);
+        rs.close(); ps.close();
+
+        ps = conn.prepareStatement("SELECT email, SUM(total_amount) FROM orders GROUP BY email");
+        rs = ps.executeQuery();
+        while (rs.next()) {
+            salesByCustomer.put(rs.getString(1), rs.getDouble(2));
+        }
+        rs.close(); ps.close();
+
+        ps = conn.prepareStatement("SELECT email, COUNT(*) FROM orders GROUP BY email");
+        rs = ps.executeQuery();
+        while (rs.next()) {
+            ordersByCustomer.put(rs.getString(1), rs.getInt(2));
+        }
+        rs.close(); ps.close();
+
+        ps = conn.prepareStatement("SELECT category, COUNT(*) FROM parts GROUP BY category");
+        rs = ps.executeQuery();
+        while (rs.next()) {
+            partsByCategory.put(rs.getString(1), rs.getInt(2));
+        }
+        rs.close(); ps.close();
+        conn.close();
+%>
+<h1>Reports Dashboard</h1>
+<p>Total Suppliers: <%= totalSuppliers %></p>
+<p>Total Parts: <%= totalParts %></p>
+<p>Total Orders: <%= totalOrders %></p>
+<p>Total Sales Amount: $<%= String.format("%.2f", totalSalesAmount) %></p>
+<script>
+    const salesData = {
+        labels: [<% for(String email : salesByCustomer.keySet()) { %>'<%= email %>',<% } %>],
+        datasets: [{
+            label: 'Sales by Customer',
+            data: [<% for(Double amt : salesByCustomer.values()) { %><%= amt %>,<% } %>],
+            backgroundColor: 'rgba(54, 162, 235, 0.6)'
+        }]
+    };
+
+    const ordersData = {
+        labels: [<% for(String email : ordersByCustomer.keySet()) { %>'<%= email %>',<% } %>],
+        datasets: [{
+            label: 'Orders by Customer',
+            data: [<% for(Integer count : ordersByCustomer.values()) { %><%= count %>,<% } %>],
+            backgroundColor: 'rgba(255, 99, 132, 0.6)'
+        }]
+    };
+
+    const categoryData = {
+        labels: [<% for(String cat : partsByCategory.keySet()) { %>'<%= cat %>',<% } %>],
+        datasets: [{
+            data: [<% for(Integer cnt : partsByCategory.values()) { %><%= cnt %>,<% } %>],
+            backgroundColor: ['#FF6384','#36A2EB','#FFCE56']
+        }]
+    };
+
+    window.onload = function() {
+        new Chart(document.createElement('canvas').getContext('2d'), { type: 'bar', data: salesData });
+        new Chart(document.createElement('canvas').getContext('2d'), { type: 'bar', data: ordersData });
+        new Chart(document.createElement('canvas').getContext('2d'), { type: 'pie', data: categoryData });
+    }
+</script>
+<%
+    } catch(Exception e) {
+        out.println("Error: " + e.getMessage());
+    }
+%>
+</body>
+</html>

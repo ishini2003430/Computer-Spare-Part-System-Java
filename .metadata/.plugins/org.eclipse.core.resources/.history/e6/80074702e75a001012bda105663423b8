@@ -1,0 +1,201 @@
+<%@ page import="java.sql.*, java.util.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Details - TechParts</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #111827;
+            color: white;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: #d1d5db;
+            padding: 10px 15px;
+            display: block;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: #1e40af;
+            color: white;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #ef4444;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .main {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .sales-block {
+            background: #ffffff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e5e7eb;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <div>
+        <h2>TechParts</h2>
+        <a href="ManagerDashboard.jsp" class="nav-link">Dashboard</a>
+        <a href="Categories.jsp" class="nav-link">Categories</a>
+        <a href="#" class="nav-link">Suppliers</a>
+        <a href="ViewOrderDetails.jsp" class="nav-link">Orders</a>
+        <a href="SalesDetails.jsp" class="nav-link active">Sales</a>
+        <a href="#" class="nav-link">Reports</a>
+        <a href="#" class="nav-link">Settings</a>
+    </div>
+    <a href="Login.jsp" class="logout-btn">Logout</a>
+</div>
+
+<div class="main">
+    <h1>Sales Details</h1>
+    <canvas id="salesChart" width="600" height="300"></canvas>
+
+<%
+    Connection conn = null;
+    PreparedStatement psOrders = null, psItems = null, psChart = null;
+    ResultSet rsOrders = null, rsItems = null, rsChart = null;
+    List<String> months = new ArrayList<>();
+    List<Double> totals = new ArrayList<>();
+
+    try {
+        Class.forName("com.mysql.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+        psChart = conn.prepareStatement("SELECT MONTH(created_at) AS m, SUM(total_amount) AS t FROM orders GROUP BY MONTH(created_at)");
+        rsChart = psChart.executeQuery();
+        while (rsChart.next()) {
+            months.add("Month " + rsChart.getInt("m"));
+            totals.add(rsChart.getDouble("t"));
+        }
+
+        psOrders = conn.prepareStatement("SELECT * FROM orders ORDER BY id DESC");
+        rsOrders = psOrders.executeQuery();
+        while (rsOrders.next()) {
+            int orderId = rsOrders.getInt("id");
+            String name = rsOrders.getString("name");
+            String email = rsOrders.getString("email");
+            double totalAmount = rsOrders.getDouble("total_amount");
+%>
+    <div class="sales-block">
+        <h3>Order ID: <%=orderId%> | Customer: <%=name%> | Email: <%=email%> | Total: $<%=String.format("%.2f", totalAmount)%></h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+            <%
+                psItems = conn.prepareStatement("SELECT * FROM order_items WHERE order_id = ?");
+                psItems.setInt(1, orderId);
+                rsItems = psItems.executeQuery();
+                while (rsItems.next()) {
+                    double price = rsItems.getDouble("price");
+                    int qty = rsItems.getInt("quantity");
+            %>
+                <tr>
+                    <td><%=rsItems.getInt("product_id")%></td>
+                    <td><%=rsItems.getString("product_name")%></td>
+                    <td>$<%=String.format("%.2f", price)%></td>
+                    <td><%=qty%></td>
+                    <td>$<%=String.format("%.2f", price * qty)%></td>
+                </tr>
+            <% } rsItems.close(); psItems.close(); %>
+            </tbody>
+        </table>
+    </div>
+<% } %>
+
+<% } catch(Exception e) { out.println("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+} finally {
+    if (rsOrders != null) rsOrders.close();
+    if (psOrders != null) psOrders.close();
+    if (psChart != null) psChart.close();
+    if (conn != null) conn.close();
+} %>
+
+<script>
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: <%= months.toString() %>,
+            datasets: [{
+                label: 'Monthly Sales ($)',
+                data: <%= totals.toString() %>,
+                backgroundColor: '#3b82f6'
+            }]
+        }
+    });
+</script>
+</div>
+</body>
+</html>

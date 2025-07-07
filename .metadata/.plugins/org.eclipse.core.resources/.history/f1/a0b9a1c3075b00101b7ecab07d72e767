@@ -1,0 +1,32 @@
+package ComputerPackage;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+
+@WebServlet("/UpdateAppearanceServlet")
+public class UpdateAppearanceServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+
+        String theme = request.getParameter("theme");
+
+        // Basic validation: default to "light" if invalid or missing
+        if (theme == null || !(theme.equals("light") || theme.equals("dark"))) {
+            theme = "light";
+        }
+
+        // Save the theme in user session
+        HttpSession session = request.getSession();
+        session.setAttribute("theme", theme);
+
+        // Optionally, you can save the theme preference to the database here
+        // if you have user accounts with persistent preferences.
+
+        // Redirect back to settings page with success message (optional)
+        response.sendRedirect("Settings.jsp?message=appearance_updated");
+    }
+}

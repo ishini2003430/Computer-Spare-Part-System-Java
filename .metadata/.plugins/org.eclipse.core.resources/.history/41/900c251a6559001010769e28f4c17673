@@ -1,0 +1,217 @@
+<element>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+           version="3.1">
+<servlet>
+<servlet-name>RegisterInsertServlet</servlet-name>
+<servlet-class>ComputerPackage.RegisterInsertServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>RegisterInsertServlet</servlet-name>
+<url-pattern>/registerinsertservlet</url-pattern>
+</servlet-mapping>
+
+
+<servlet>
+<servlet-name>RUpdateServlet</servlet-name>
+<servlet-class>ComputerPackage.RUpdateServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>RUpdateServlet</servlet-name>
+<url-pattern>/RUpdateServlet</url-pattern>
+</servlet-mapping>
+
+<servlet>
+<servlet-name>DeleteRegisterServlet</servlet-name>
+<servlet-class>ComputerPackage.DeleteRegisterServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+<servlet-name>DeleteRegisterServlet</servlet-name>
+<url-pattern>/DeleteRegisterServlet</url-pattern>
+</servlet-mapping>
+
+   <servlet>
+        <servlet-name>AddPartServlet</servlet-name>
+        <servlet-class>ComputerPackage.AddPartServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AddPartServlet</servlet-name>
+        <url-pattern>/AddPartServlet</url-pattern>
+    </servlet-mapping>
+
+<servlet>
+        <servlet-name>UpdatePartServlet</servlet-name>
+        <servlet-class>ComputerPackage.UpdatePartServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UpdatePartServlet</servlet-name>
+        <url-pattern>/UpdatePartServlet</url-pattern>
+    </servlet-mapping>
+
+<servlet>
+        <servlet-name>DeletePartServlet</servlet-name>
+        <servlet-class>ComputerPackage.DeletePartServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DeletePartServlet</servlet-name>
+        <url-pattern>/DeletePartServlet</url-pattern>
+    </servlet-mapping>
+    
+  <servlet>
+        <servlet-name>AddLaptopServlet</servlet-name>
+        <servlet-class>ComputerPackage.AddLaptopServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AddLaptopServlet</servlet-name>
+        <url-pattern>/AddLaptopServlet</url-pattern>
+    </servlet-mapping>  
+    
+    
+    <servlet>
+        <servlet-name>UpdateLaptopServlet</servlet-name>
+        <servlet-class>ComputerPackage.UpdateLaptopServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UpdateLaptopServlet</servlet-name>
+        <url-pattern>/UpdateLaptopServlet</url-pattern>
+    </servlet-mapping>  
+    
+     <servlet>
+        <servlet-name>DeleteLaptopServlet</servlet-name>
+        <servlet-class>ComputerPackage.DeleteLaptopServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DeleteLaptopServlet</servlet-name>
+        <url-pattern>/DeleteLaptopServlet</url-pattern>
+    </servlet-mapping>  
+    
+     <servlet>
+        <servlet-name>AddLaptopAccessServlet</servlet-name>
+        <servlet-class>ComputerPackage.AddLaptopAccessServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AddLaptopAccessServlet</servlet-name>
+        <url-pattern>/AddLaptopAccessServlet</url-pattern>
+    </servlet-mapping>  
+    
+     <servlet>
+        <servlet-name>DeleteLaptopAccessServlet</servlet-name>
+        <servlet-class>ComputerPackage.DeleteLaptopAccessServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DeleteLaptopAccessServlet</servlet-name>
+        <url-pattern>/DeleteLaptopAccessServlet</url-pattern>
+    </servlet-mapping>
+    
+    
+     <servlet>
+        <servlet-name>UpdateLaptopAccessServlet</servlet-name>
+        <servlet-class>ComputerPackage.UpdateLaptopAccessServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UpdateLaptopAccessServlet</servlet-name>
+        <url-pattern>/UpdateLaptopAccessServlet</url-pattern>
+    </servlet-mapping>
+    
+     <servlet>
+        <servlet-name>AddAccessoryServlet</servlet-name>
+        <servlet-class>ComputerPackage.AddAccessoryServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AddAccessoryServlet</servlet-name>
+        <url-pattern>/AddAccessoryServlet</url-pattern>
+    </servlet-mapping>
+    
+     <servlet>
+        <servlet-name>UpdateAccessoryServlet</servlet-name>
+        <servlet-class>ComputerPackage.UpdateAccessoryServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UpdateAccessoryServlet</servlet-name>
+        <url-pattern>/UpdateAccessoryServlet</url-pattern>
+    </servlet-mapping>
+    
+     <servlet>
+        <servlet-name>DeleteAccessoryServlet</servlet-name>
+        <servlet-class>ComputerPackage.DeleteAccessoryServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DeleteAccessoryServlet</servlet-name>
+        <url-pattern>/DeleteAccessoryServlet</url-pattern>
+    </servlet-mapping>
+    
+     <servlet>
+        <servlet-name>AddCctvAccessoryServlet</servlet-name>
+        <servlet-class>ComputerPackage.AddCctvAccessoryServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AddCctvAccessoryServlet</servlet-name>
+        <url-pattern>/AddCctvAccessoryServlet</url-pattern>
+    </servlet-mapping>
+    
+     <servlet>
+        <servlet-name>UpdateCctvAccessoryServlet</servlet-name>
+        <servlet-class>ComputerPackage.UpdateCctvAccessoryServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>UpdateCctvAccessoryServlet</servlet-name>
+        <url-pattern>/UpdateCctvAccessoryServlet</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>DeleteCctvAccessServlet</servlet-name>
+        <servlet-class>ComputerPackage.DeleteCctvAccessServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DeleteCctvAccessServlet</servlet-name>
+        <url-pattern>/DeleteCctvAccessServlet</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>AddPrinterServlet</servlet-name>
+        <servlet-class>ComputerPackage.AddPrinterServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AddPrinterServlet</servlet-name>
+        <url-pattern>/AddPrinterServlet</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name> AddToCartServlet</servlet-name>
+        <servlet-class>ComputerPackage. AddToCartServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name> AddToCartServlet</servlet-name>
+        <url-pattern>/ AddToCartServlet</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name> UpdateCartServlet</servlet-name>
+        <servlet-class>ComputerPackage. UpdateCartServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name> UpdateCartServlet</servlet-name>
+        <url-pattern>/UpdateCartServlet</url-pattern>
+    </servlet-mapping>
+</web-app>
+</element>
+

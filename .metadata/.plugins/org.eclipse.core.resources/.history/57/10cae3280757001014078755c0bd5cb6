@@ -1,0 +1,65 @@
+package ComputerPackage;
+
+import javax.servlet.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.sql.*;
+
+@WebServlet("/AddPartServlet")
+public class AddPartServlet extends HttpServlet {
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        // Get form data
+        String partName = request.getParameter("partName");
+        String category = request.getParameter("category");
+        String supplier = request.getParameter("supplier");
+        int quantity = Integer.parseInt(request.getParameter("quantity"));
+        int minStock = Integer.parseInt(request.getParameter("minStock"));
+        double price = Double.parseDouble(request.getParameter("price"));
+        
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            // Load JDBC driver
+            Class.forName("com.mysql.jdbc.Driver");
+
+            // Connect to the database
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/parts", "root", "ishini2003");
+
+            // SQL query to insert a new part
+            String sql = "INSERT INTO part (part_name, category, supplier, quantity, min_stock, price) VALUES (?, ?, ?, ?, ?, ?)";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, partName);
+            pstmt.setString(2, category);
+            pstmt.setString(3, supplier);
+            pstmt.setInt(4, quantity);
+            pstmt.setInt(5, minStock);
+            pstmt.setDouble(6, price);
+
+            // Execute update
+            int result = pstmt.executeUpdate();
+
+            if (result > 0) {
+                // Redirect to success page or part list page
+                response.sendRedirect("ViewParts.jsp");
+            } else {
+                response.getWriter().println("Failed to add part.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().println("Error: " + e.getMessage());
+        } finally {
+            try {
+                if (pstmt != null) pstmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+    }
+}

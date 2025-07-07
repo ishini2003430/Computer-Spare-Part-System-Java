@@ -1,0 +1,19 @@
+package ComputerPackage;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.io.IOException;
+
+@WebServlet("/UpdateAppearanceServlet")
+public class UpdateAppearanceServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String selectedTheme = request.getParameter("theme");
+        if (selectedTheme == null || (!selectedTheme.equals("light") && !selectedTheme.equals("dark"))) {
+            selectedTheme = "light"; // default fallback
+        }
+        HttpSession session = request.getSession();
+        session.setAttribute("theme", selectedTheme);
+        response.sendRedirect("Setting.jsp");
+    }
+}

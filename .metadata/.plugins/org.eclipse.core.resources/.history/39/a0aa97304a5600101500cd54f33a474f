@@ -1,0 +1,482 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>TechParts Management System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            color: #1d4ed8;
+        }
+
+        .logo p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login-btn a {
+            background: #0f172a;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 50px 80px;
+            background: #e8f0fc;
+        }
+
+        .text-content {
+            max-width: 50%;
+        }
+
+        .text-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .text-content .highlight {
+            color: #2563eb;
+        }
+
+        .text-content p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .btn.dark {
+            background-color: #0f172a;
+            color: white;
+        }
+
+        .btn.light {
+            background-color: white;
+            border: 1px solid #ccc;
+            color: #0f172a;
+        }
+
+        .image-content {
+            position: relative;
+        }
+
+        .image-content img {
+            width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .tag {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+        }
+
+        .tag strong {
+            display: block;
+            color: #1d4ed8;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            color: #2563eb;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+        }
+        .nav-links a.active-link {
+            color: #2563eb;
+           font-weight: bold;
+        }
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar input {
+            padding: 8px 32px 8px 30px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-bar::before {
+            content: '🔍';
+            position: absolute;
+            left: 10px;
+            top: 7px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .cart {
+            position: relative;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .cart::after {
+            content: '0';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: red;
+            color: white;
+            font-size: 10px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .login-btn a {
+            background: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 50px 80px;
+            background: #e8f0fc;
+        }
+
+        .text-content {
+            max-width: 50%;
+        }
+
+        .text-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .text-content .highlight {
+            color: #2563eb;
+        }
+
+        .text-content p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .btn.dark {
+            background-color: #0f172a;
+            color: white;
+        }
+
+        .btn.light {
+            background-color: white;
+            border: 1px solid #ccc;
+            color: #0f172a;
+        }
+
+        .image-content {
+            position: relative;
+        }
+
+        .image-content img {
+            width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .tag {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+        }
+
+        .tag strong {
+            display: block;
+            color: #1d4ed8;
+        }
+         .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 220px;
+            top: 38px;
+            left: 0;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+            border-radius: 6px;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+      
+<div class="header">
+    <div class="logo">
+        <img src="images/logo.png" alt="logo" width="40" height="40">
+        <h2>TechParts</h2>
+    </div>
+    <div class="nav-links">
+        <a href="Home.jsp">Home</a>
+        <a href="AboutUs.jsp">About Us</a>
+        <div class="dropdown">
+    <span class="dropbtn">All Products</span>
+    <div class="dropdown-content">
+        <a href="laptops.jsp">Laptops</a>
+        <a href="laptopAccessories.jsp">Laptop Accessories</a>
+        <a href="desktopAccessories.jsp">Desktop & Accessories</a>
+        <a href="cctv.jsp">CCTV Camera & Accessories</a>
+        <a href="cameraItems.jsp">Camera Items</a>
+        <a href="printers.jsp">Printers</a>
+        <a href="giftVouchers.jsp">Gift Vouchers</a>
+    </div>
+</div>
+
+        <a href="services.jsp">Services</a>
+        <a href="payment.jsp">Payment Methods</a>
+        <a href="contact.jsp">Contact Us</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="search-bar">
+            <input type="text" placeholder="Search products...">
+        </div>
+        <div class="cart">🛒</div>
+        <div class="login-btn">
+            <a href="Login.jsp">Login</a>
+        </div>
+    </div>
+</div>
+
+    <div class="main-content">
+        <div class="text-content">
+            <h1>Manage Your <span class="highlight">Tech Inventory</span></h1>
+            <p>Streamline your computer spare parts management with our comprehensive inventory system. Track stock, manage suppliers, and grow your business.</p>
+            <div class="buttons">
+                <a href="Register.jsp" class="btn dark">Get Started</a>
+                <a href="about.jsp" class="btn light">Learn More</a>
+            </div>
+        </div>
+        <div class="image-content">
+            <img src="images/motherboard.jpeg" alt="Motherboard Image">
+            <div class="tag">
+                <strong>⚡ Fast & Efficient</strong>
+                Real-time updates
+            </div>
+        </div>
+    </div>
+    <!-- Features Section -->
+<div style="text-align: center; padding: 60px 20px; background: #fff;">
+    <h2 style="font-size: 32px; margin-bottom: 15px; color: #111827;">Everything You Need</h2>
+    <p style="font-size: 18px; color: #555; margin-bottom: 50px;">
+        Our comprehensive platform provides all the tools you need to manage your computer parts inventory efficiently.
+    </p>
+
+    <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 30px;">
+        <!-- Card 1 -->
+        <div style="width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 30px; text-align: center;">
+            <div style="background: #e0edff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px;">
+                <img src="images/inventory.png" alt="Inventory" style="width: 32px; margin-top: 14px;">
+            </div>
+            <h3 style="font-size: 18px; color: #111827; margin-bottom: 10px;">Inventory Management</h3>
+            <p style="font-size: 14px; color: #555;">Track and manage your spare parts inventory with ease</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div style="width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 30px; text-align: center;">
+            <div style="background: #e0edff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px;">
+                <img src="images/supplier.png" alt="Supplier" style="width: 32px; margin-top: 14px;">
+            </div>
+            <h3 style="font-size: 18px; color: #111827; margin-bottom: 10px;">Supplier Management</h3>
+            <p style="font-size: 14px; color: #555;">Maintain relationships with your trusted suppliers</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div style="width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 30px; text-align: center;">
+            <div style="background: #e0edff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px;">
+                <img src="images/sales.png" alt="Sales" style="width: 32px; margin-top: 14px;">
+            </div>
+            <h3 style="font-size: 18px; color: #111827; margin-bottom: 10px;">Sales Analytics</h3>
+            <p style="font-size: 14px; color: #555;">Monitor your sales performance and trends</p>
+        </div>
+
+        <!-- Card 4 -->
+        <div style="width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 30px; text-align: center;">
+            <div style="background: #e0edff; width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 15px;">
+                <img src="images/security.png" alt="Security" style="width: 32px; margin-top: 14px;">
+            </div>
+            <h3 style="font-size: 18px; color: #111827; margin-bottom: 10px;">Secure & Reliable</h3>
+            <p style="font-size: 14px; color: #555;">Your data is protected with enterprise-grade security</p>
+        </div>
+    </div>
+</div>
+    <!-- Built for the Future Section -->
+<div style="display: flex; align-items: center; justify-content: center; padding: 60px 80px; gap: 50px; background: #fff; flex-wrap: wrap;">
+    <div style="flex: 1;">
+        <img src="images/code.jpeg" alt="Code Image" style="width: 100%; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);">
+    </div>
+    <div style="flex: 1; max-width: 500px;">
+        <h2 style="font-size: 28px; color: #111827; margin-bottom: 15px;">Built for the Future</h2>
+        <p style="color: #555; margin-bottom: 25px;">
+            Our system uses cutting-edge technology to ensure your inventory management is always up-to-date, secure, and scalable as your business grows.
+        </p>
+        <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 10px; color: #10b981;">✔ Enterprise-grade security</li>
+            <li style="margin-bottom: 10px; color: #3b82f6;">✔ Real-time synchronization</li>
+            <li style="color: #8b5cf6;">✔ Advanced analytics</li>
+        </ul>
+    </div>
+</div>
+    <!-- Call to Action -->
+<div style="background-color: #2563eb; color: white; text-align: center; padding: 60px 20px;">
+    <h2 style="font-size: 28px; margin-bottom: 15px;">Ready to Get Started?</h2>
+    <p style="font-size: 16px; margin-bottom: 30px;">Join thousands of businesses already using TechParts to manage their inventory.</p>
+    <a href="Register.jsp" style="background-color: white; color: #0f172a; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+        ➔ Sign Up Now
+    </a>
+</div>
+
+<!-- Footer -->
+<div style="background-color: #0f172a; color: white; padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="images/logo.png" alt="logo" width="30">
+        <div>
+            <strong style="font-size: 16px;">TechParts</strong><br>
+            <small style="color: #94a3b8;">Management System</small>
+        </div>
+    </div>
+    <div style="font-size: 14px;">© 2024 TechParts. All rights reserved.</div>
+</div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function () {
+                navLinks.forEach(l => l.classList.remove('active-link'));
+                this.classList.add('active-link');
+            });
+        });
+    });
+</script>
+    
+</body>
+</html>

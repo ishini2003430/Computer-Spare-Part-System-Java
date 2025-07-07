@@ -1,0 +1,274 @@
+<%@ page import="java.sql.*, java.util.*, ComputerPackage.CartItem" %>
+<%@ page session="true" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>CCTV Accessories - TechParts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo h2 {
+            margin: 0;
+            color: #2563eb;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+        }
+        .nav-links a.active-link {
+            color: #2563eb;
+            font-weight: bold;
+        }
+        .dropdown {
+            position: relative;
+        }
+        .dropbtn {
+            cursor: pointer;
+            color: #374151;
+            font-weight: 500;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 220px;
+            top: 30px;
+            left: 0;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+            border-radius: 6px;
+        }
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .cart {
+            position: relative;
+            font-size: 20px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: red;
+            color: white;
+            font-size: 10px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .login-btn a {
+            background: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .content {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto 50px auto;
+        }
+        h2 {
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card img {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        .card h3 {
+            font-size: 16px;
+            margin: 10px 0 5px;
+            color: #111827;
+        }
+        .card p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #374151;
+        }
+        .price { color: #e11d48; font-weight: bold; }
+        .cash-price { color: #16a34a; font-weight: bold; }
+        .buttons {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .buttons button {
+            padding: 7px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        .add-cart { background-color: #6b7280; }
+        .view-more { background-color: #2563eb; }
+        .buy-now { background-color: #dc2626; }
+        .add-cart:hover { background-color: #4b5563; }
+        .view-more:hover { background-color: #1d4ed8; }
+        .buy-now:hover { background-color: #b91c1c; }
+        @media (max-width: 600px) {
+            .header {
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 15px 20px;
+            }
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+                gap: 15px;
+            }
+            .dropdown-content {
+                min-width: 150px;
+                top: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <img src="images/logo.png" alt="logo" width="40" height="40" />
+        <h2>TechParts</h2>
+    </div>
+    <div class="nav-links">
+        <a href="Home.jsp">Home</a>
+        <a href="AboutUs.jsp">About Us</a>
+        <div class="dropdown">
+            <span class="dropbtn">All Products</span>
+            <div class="dropdown-content">
+                <a href="Laptops.jsp">Laptops</a>
+                <a href="LaptopAccessories.jsp">Laptop Accessories</a>
+                <a href="computerAccessories.jsp">Desktop & Accessories</a>
+                <a href="cctvcamera.jsp">CCTV Camera & Accessories</a>
+                <a href="printers.jsp">Printers</a>
+            </div>
+        </div>
+        <a href="Services.jsp">Services</a>
+        <a href="Paymentmethod.jsp">Payment Methods</a>
+        <a href="Contactus.jsp">Contact Us</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="ViewCart.jsp" class="cart">
+            🛒
+            <% 
+                List<CartItem> cart = (List<CartItem>) session.getAttribute("cart");
+                int count = 0;
+                if (cart != null) {
+                    for (CartItem item : cart) {
+                        count += item.getQuantity();
+                    }
+                }
+            %>
+            <span class="cart-count"><%= count %></span>
+        </a>
+        <div class="login-btn">
+            <a href="Login.jsp">Login</a>
+        </div>
+    </div>
+</div>
+<div class="content">
+    <h2>All CCTV Accessories</h2>
+    <div class="grid">
+        <% try {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM cctvaccess WHERE category='CCTV Accessory'");
+            while (rs.next()) {
+        %>
+        <div class="card">
+            <img src="<%= rs.getString("image_url") %>" alt="CCTV Accessory" />
+            <h3><%= rs.getString("name") %></h3>
+            <p><%= rs.getString("brand") %> | <%= rs.getString("item_code") %></p>
+            <p class="price">Rs. <%= rs.getDouble("price") %></p>
+            <p class="cash-price">Cash: Rs. <%= rs.getDouble("cash_price") %></p>
+            <p>Status: <%= rs.getString("stock_status") %></p>
+            <div class="buttons">
+                <form action="AddToCartServlet" method="post">
+                    <input type="hidden" name="id" value="<%= rs.getInt("id") %>" />
+                    <input type="hidden" name="name" value="<%= rs.getString("name") %>" />
+                    <input type="hidden" name="price" value="<%= rs.getDouble("price") %>" />
+                    <input type="hidden" name="quantity" value="1" />
+                    <button type="submit" class="add-cart">Add to Cart</button>
+                </form>
+                <a href="ViewCctvAccessDetails.jsp?id=<%= rs.getInt("id") %>" class="view-more" style="text-decoration:none; padding: 8px 12px; border-radius: 6px;">View More</a>
+                <form action="BuyNowServlet" method="post">
+                    <input type="hidden" name="id" value="<%= rs.getInt("id") %>" />
+                    <input type="hidden" name="name" value="<%= rs.getString("name") %>" />
+                    <input type="hidden" name="price" value="<%= rs.getDouble("price") %>" />
+                    <input type="hidden" name="quantity" value="1" />
+                    <button type="submit" class="buy-now">Buy Now</button>
+                </form>
+            </div>
+        </div>
+        <% }
+            conn.close();
+        } catch (Exception e) {
+            out.print("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+        } %>
+    </div>
+</div>
+</body>
+</html>

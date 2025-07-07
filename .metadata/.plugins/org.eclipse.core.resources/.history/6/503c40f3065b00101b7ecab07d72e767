@@ -1,0 +1,197 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Settings - TechParts</title>
+    <style>
+        /* Reset and base */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background-color: #111827; /* dark slate */
+            color: white;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar h2 {
+            margin: 0 0 2rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+        .nav-link {
+            color: #d1d5db;
+            padding: 12px 18px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 0.7rem;
+            font-weight: 600;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .nav-link:hover {
+            background-color: #1e40af;
+            color: white;
+        }
+        .nav-link.active {
+            background-color: #2563eb;
+            color: white;
+        }
+        .logout-btn {
+            margin-top: auto;
+            padding: 12px 18px;
+            background-color: #ef4444;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            user-select: none;
+        }
+        .logout-btn:hover {
+            background-color: #b91c1c;
+        }
+
+        /* Main content */
+        .main {
+            flex-grow: 1;
+            padding: 3rem 4rem;
+            overflow-y: auto;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-weight: 700;
+            font-size: 2rem;
+            color: #1f2937;
+        }
+
+        /* Form styling */
+        form.settings-form {
+            max-width: 450px;
+            background: white;
+            padding: 2rem 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+            margin-top: 20px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.8px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.25s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 5px #2563eb;
+        }
+
+        button[type="submit"] {
+            margin-top: 2rem;
+            background-color: #2563eb;
+            color: white;
+            padding: 12px 20px;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            font-size: 1.1rem;
+        }
+        button[type="submit"]:hover {
+            background-color: #1e40af;
+        }
+
+        /* Responsive */
+        @media (max-width: 720px) {
+            body {
+                flex-direction: column;
+                height: auto;
+            }
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                padding: 1rem;
+                overflow-x: auto;
+            }
+            .sidebar h2 {
+                flex: 1 0 auto;
+                margin-bottom: 0;
+            }
+            .nav-link {
+                margin: 0 10px 0 0;
+                padding: 8px 12px;
+            }
+            .logout-btn {
+                margin: 0 0 0 auto;
+                padding: 8px 12px;
+            }
+            .main {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>TechParts</h2>
+        <a href="ManagerDashboard.jsp" class="nav-link">Dashboard</a>
+        <a href="Categories.jsp" class="nav-link">Categories</a>
+        <a href="SupplierDetails.jsp" class="nav-link">Suppliers</a>
+        <a href="ViewOrderDetails.jsp" class="nav-link">Orders</a>
+        <a href="SalesDetails.jsp" class="nav-link">Sales</a>
+        <a href="Setting.jsp" class="nav-link active">Settings</a>
+        <a href="Login.jsp" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="main">
+        <h1>Settings</h1>
+
+        <form action="UpdateSettingsServlet" method="post" class="settings-form">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="<%= request.getSession().getAttribute("username") != null ? request.getSession().getAttribute("username") : "" %>" required />
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" value="<%= request.getSession().getAttribute("email") != null ? request.getSession().getAttribute("email") : "" %>" required />
+
+            <label for="password">New Password</label>
+            <input type="password" id="password" name="password" placeholder="Leave blank to keep current password" />
+
+            <button type="submit">Update Settings</button>
+        </form>
+    </div>
+</body>
+</html>

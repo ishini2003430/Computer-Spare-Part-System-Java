@@ -1,0 +1,266 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Methods - TechParts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+            color: #111827;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h2 {
+            margin: 0;
+            color: #2563eb;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a, .dropbtn {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-links a.active-link {
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 220px;
+            top: 38px;
+            left: 0;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+            z-index: 999;
+            border-radius: 6px;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .dropdown.show .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .search-bar input {
+            padding: 8px 32px 8px 30px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .cart {
+            position: relative;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .cart::after {
+            content: '0';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: red;
+            color: white;
+            font-size: 10px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .login-btn a {
+            background: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .hero {
+            background-image: url('images/banner.jpeg');
+            background-size: cover;
+            background-position: center;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        ul li img {
+            margin-right: 10px;
+        }
+
+        footer {
+            background-color: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <img src="images/logo.png" alt="logo" width="40" height="40">
+        <h2>TechParts</h2>
+    </div>
+    <div class="nav-links">
+        <a href="Home.jsp">Home</a>
+        <a href="AboutUs.jsp">About Us</a>
+        <div class="dropdown">
+            <span class="dropbtn">All Products</span>
+            <div class="dropdown-content">
+                <a href="Laptops.jsp">Laptops</a>
+                <a href="LaptopAccessories.jsp">Laptop Accessories</a>
+                <a href="computerAccessories.jsp">Desktop & Accessories</a>
+                <a href="cctvcamera.jsp">CCTV Camera & Accessories</a>
+                
+                <a href="printers.jsp">Printers</a>
+                
+            </div>
+        </div>
+        <a href="Services.jsp">Services</a>
+        <a class="active-link" href="payment.jsp">Payment Methods</a>
+        <a href="contact.jsp">Contact Us</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="search-bar">
+            <input type="text" placeholder="Search products...">
+        </div>
+        <div class="cart">🛒</div>
+        <div class="login-btn">
+            <a href="Login.jsp">Login</a>
+        </div>
+    </div>
+</div>
+
+<div class="hero">
+    <div>
+        <h1>Payment Methods</h1>
+        <p>LARGEST & BEST ONLINE LAPTOP STORE IN SRI LANKA</p>
+    </div>
+</div>
+
+<div class="container">
+    <h2>In Store Payments</h2>
+    <ul>
+        <li><img src="images/money.png" alt="Cash" width="24"> Cash (Currency – LKR)</li>
+        <li><img src="images/transfer.png" alt="Bank" width="24"> Bank Transfer</li>
+        <li><img src="images/credit.png" alt="Card" width="24"> Card – VISA / MASTERCARD</li>
+    </ul>
+
+    <h2>Online Payments</h2>
+    <ul>
+        <li><img src="images/transfer.png" alt="Transfer" width="24"> Online Transfer</li>
+        <li><img src="images/bank.png" alt="Deposit" width="24"> Bank Deposit</li>
+        <li><img src="images/cashless-payment.png" alt="Website" width="24"> Online payment through Website</li>
+    </ul>
+
+    <p>1. <img src="images/whatsapp.png" alt="WhatsApp" width="20"> Online payments or bank deposits require proof of payment. Send receipt to +94 714 576 576 via WhatsApp.</p>
+  
+    <p>2. <img src="images/telephone.png" alt="Phone" width="20"> Call/WhatsApp +94 714 576 576 to get bank account details.</p>
+ 
+</div>
+
+<footer>
+    &copy; 2025 TechParts. All Rights Reserved.
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdown = document.querySelector('.dropdown');
+        const dropbtn = dropdown.querySelector('.dropbtn');
+
+        dropbtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdown.classList.toggle('show');
+        });
+
+        document.addEventListener('click', function() {
+            dropdown.classList.remove('show');
+        });
+    });
+</script>
+</body>
+</html>

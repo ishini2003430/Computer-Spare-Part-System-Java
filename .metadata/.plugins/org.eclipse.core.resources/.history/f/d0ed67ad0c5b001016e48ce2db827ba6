@@ -1,0 +1,229 @@
+<%@ page import="java.sql.*, java.util.*" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Order Details - TechParts</title>
+    <meta charset="UTF-8" />
+    <style>
+        /* --- Paste your sidebar & general CSS here from ManagerDashboard.jsp --- */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background-color: #111827;
+            color: white;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: #d1d5db;
+            padding: 10px 15px;
+            display: block;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s;
+            margin-bottom: 8px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: #1e40af;
+            color: #ffffff;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #ef4444;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Main content area */
+        .main {
+            flex: 1;
+            padding: 2rem;
+            background-color: #f9fafb;
+            overflow-x: auto;
+        }
+
+        h1 {
+            margin-bottom: 1rem;
+        }
+
+        /* Order display styling */
+        .order-block {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .order-header p {
+            margin: 4px 0;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e5e7eb;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div>
+        <h2>TechParts</h2>
+        <a href="ManagerDashboard.jsp" class="nav-link">Dashboard</a>
+        <a href="Categories.jsp" class="nav-link">Categories</a>
+        <a href="#" class="nav-link">Suppliers</a>
+        <a href="ViewOrderDetails.jsp" class="nav-link active">Orders</a>
+        <a href="#" class="nav-link">Sales</a>
+        <a href="#" class="nav-link">Reports</a>
+        <a href="#" class="nav-link">Settings</a>
+    </div>
+    <a href="Login.jsp" class="logout-btn" style="text-align: center; display: block; text-decoration: none;">Logout</a>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+    <h1>All Orders and Their Items</h1>
+
+<%
+    Connection conn = null;
+    PreparedStatement psOrders = null;
+    PreparedStatement psItems = null;
+    ResultSet rsOrders = null;
+    ResultSet rsItems = null;
+
+    try {
+        Class.forName("com.mysql.jdbc.Driver");
+        conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+        String sqlOrders = "SELECT * FROM orders ORDER BY id DESC";
+        psOrders = conn.prepareStatement(sqlOrders);
+        rsOrders = psOrders.executeQuery();
+
+        while (rsOrders.next()) {
+            int orderId = rsOrders.getInt("id");
+            String name = rsOrders.getString("name");
+            String email = rsOrders.getString("email");
+            String phone = rsOrders.getString("phone");
+            String address = rsOrders.getString("address");
+            double totalAmount = rsOrders.getDouble("total_amount");
+%>
+    <div class="order-block">
+        <div class="order-header">
+            <h2>Order ID: <%=orderId%></h2>
+            <p><strong>Name:</strong> <%=name%></p>
+            <p><strong>Email:</strong> <%=email%></p>
+            <p><strong>Phone:</strong> <%=phone%></p>
+            <p><strong>Address:</strong> <%=address%></p>
+            <p><strong>Total Amount:</strong> $<%=String.format("%.2f", totalAmount)%></p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Price (each)</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+            <%
+                String sqlItems = "SELECT * FROM order_items WHERE order_id = ?";
+                psItems = conn.prepareStatement(sqlItems);
+                psItems.setInt(1, orderId);
+                rsItems = psItems.executeQuery();
+
+                while (rsItems.next()) {
+                    int productId = rsItems.getInt("product_id");
+                    String productName = rsItems.getString("product_name");
+                    double price = rsItems.getDouble("price");
+                    int quantity = rsItems.getInt("quantity");
+                    double subtotal = price * quantity;
+            %>
+                <tr>
+                    <td><%=productId%></td>
+                    <td><%=productName%></td>
+                    <td>$<%=String.format("%.2f", price)%></td>
+                    <td><%=quantity%></td>
+                    <td>$<%=String.format("%.2f", subtotal)%></td>
+                </tr>
+            <%
+                }
+                rsItems.close();
+                psItems.close();
+            %>
+            </tbody>
+        </table>
+    </div>
+<%
+        }
+    } catch(Exception e) {
+        out.println("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+        e.printStackTrace();
+    } finally {
+        try {
+            if(rsOrders != null) rsOrders.close();
+            if(psOrders != null) psOrders.close();
+            if(conn != null) conn.close();
+        } catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+%>
+
+</div>
+
+</body>
+</html>

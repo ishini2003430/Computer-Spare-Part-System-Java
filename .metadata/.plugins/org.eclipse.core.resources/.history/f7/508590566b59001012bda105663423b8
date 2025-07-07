@@ -1,0 +1,58 @@
+package ComputerPackage;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+
+import java.io.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.util.*;
+
+@WebServlet("/AddToCartServlet")
+public class AddToCartServlet extends HttpServlet {
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Get item details from request
+        String name = request.getParameter("name");
+        double price = Double.parseDouble(request.getParameter("price"));
+        String image = request.getParameter("image");
+        int quantity = 1; // default quantity is 1
+
+        HttpSession session = request.getSession();
+        List<Map<String, Object>> cart = (List<Map<String, Object>>) session.getAttribute("cart");
+
+        if (cart == null) {
+            cart = new ArrayList<>();
+        }
+
+        boolean itemExists = false;
+
+        for (Map<String, Object> item : cart) {
+            if (item.get("name").equals(name)) {
+                // If item already in cart, increase quantity
+                int existingQty = (int) item.get("quantity");
+                item.put("quantity", existingQty + 1);
+                itemExists = true;
+                break;
+            }
+        }
+
+        if (!itemExists) {
+            Map<String, Object> newItem = new HashMap<>();
+            newItem.put("name", name);
+            newItem.put("price", price);
+            newItem.put("image", image);
+            newItem.put("quantity", quantity);
+            cart.add(newItem);
+        }
+
+        session.setAttribute("cart", cart);
+        response.sendRedirect("ViewCart.jsp");  // Redirect to cart page
+    }
+}

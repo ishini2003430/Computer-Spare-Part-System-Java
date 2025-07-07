@@ -1,0 +1,178 @@
+<%@ page import="java.sql.*" %>
+
+<%
+    String orderIdStr = request.getParameter("orderId");
+    if (orderIdStr == null || orderIdStr.trim().isEmpty()) {
+%>
+    <p style="color:red; font-weight:bold;">Order ID is missing. Please select a valid order.</p>
+<%
+    } else {
+        int orderId = 0;
+        try {
+            orderId = Integer.parseInt(orderIdStr);
+        } catch (NumberFormatException e) {
+%>
+    <p style="color:red; font-weight:bold;">Invalid Order ID.</p>
+<%
+        }
+
+        if (orderId != 0) {
+            Connection conn = null;
+            PreparedStatement psOrder = null;
+            PreparedStatement psItems = null;
+            ResultSet rsOrder = null;
+            ResultSet rsItems = null;
+
+            String name = "";
+            String email = "";
+            String phone = "";
+            String address = "";
+            double totalAmount = 0;
+
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/computer", "root", "ishini2003");
+
+                // Get order info
+                psOrder = conn.prepareStatement("SELECT * FROM orders WHERE id = ?");
+                psOrder.setInt(1, orderId);
+                rsOrder = psOrder.executeQuery();
+
+                if (rsOrder.next()) {
+                    name = rsOrder.getString("name");
+                    email = rsOrder.getString("email");
+                    phone = rsOrder.getString("phone");
+                    address = rsOrder.getString("address");
+                    totalAmount = rsOrder.getDouble("total_amount");
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Details - Order #<%= orderId %></title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            padding: 30px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2563eb;
+            margin-bottom: 20px;
+        }
+        .order-info p {
+            margin: 6px 0;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #2563eb;
+            color: white;
+        }
+        .total {
+            font-weight: bold;
+            font-size: 18px;
+            text-align: right;
+            margin-top: 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Order Details - Order #<%= orderId %></h2>
+
+    <div class="order-info">
+        <p><strong>Customer Name:</strong> <%= name %></p>
+        <p><strong>Email:</strong> <%= email %></p>
+        <p><strong>Phone:</strong> <%= phone %></p>
+        <p><strong>Address:</strong> <%= address %></p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Price (Rs.)</th>
+                <th>Quantity</th>
+                <th>Subtotal (Rs.)</th>
+            </tr>
+        </thead>
+        <tbody>
+<%
+                    // Get order items
+                    psItems = conn.prepareStatement("SELECT * FROM order_items WHERE order_id = ?");
+                    psItems.setInt(1, orderId);
+                    rsItems = psItems.executeQuery();
+
+                    while (rsItems.next()) {
+                        String productName = rsItems.getString("product_name");
+                        double price = rsItems.getDouble("price");
+                        int quantity = rsItems.getInt("quantity");
+                        double subtotal = price * quantity;
+%>
+            <tr>
+                <td><%= productName %></td>
+                <td><%= String.format("%.2f", price) %></td>
+                <td><%= quantity %></td>
+                <td><%= String.format("%.2f", subtotal) %></td>
+            </tr>
+<%
+                    }
+%>
+        </tbody>
+    </table>
+
+    <p class="total">Total Amount: Rs. <%= String.format("%.2f", totalAmount) %></p>
+
+    <a href="OrdersList.jsp" class="back-link">Back to Orders List</a>
+</div>
+
+</body>
+</html>
+<%
+                } else {
+%>
+    <p style="color:red; font-weight:bold;">Order not found.</p>
+<%
+                }
+            } catch (Exception e) {
+                out.print("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+            } finally {
+                if (rsOrder != null) try { rsOrder.close(); } catch (Exception ignored) {}
+                if (rsItems != null) try { rsItems.close(); } catch (Exception ignored) {}
+                if (psOrder != null) try { psOrder.close(); } catch (Exception ignored) {}
+                if (psItems != null) try { psItems.close(); } catch (Exception ignored) {}
+                if (conn != null) try { conn.close(); } catch (Exception ignored) {}
+            }
+        }
+    }
+}
+%>

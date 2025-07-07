@@ -1,0 +1,69 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Order Placed - TechParts</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 100px auto;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #10b981;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #374151;
+        }
+
+        .order-success {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 25px;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 24px;
+            background-color: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .back-button:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Thank You!</h1>
+    <div class="order-success">Your order has been placed successfully.</div>
+    <p>You will receive a confirmation email with order details shortly.</p>
+    <p>If you have any questions, feel free to <a href="contact.jsp">contact us</a>.</p>
+    <a href="Home.jsp" class="back-button">Back to Home</a>
+</div>
+
+</body>
+</html>
